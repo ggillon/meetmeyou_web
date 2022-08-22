@@ -23,5 +23,13 @@
   "invalid_email": "Invalid Email",
   "first_name_required": "First name is required",
   "last_name_required": "Last name is required",
-  "phone_no_cannot_empty" : "Phone number can't be empty"
+  "phone_no_cannot_empty" : "Phone number can't be empty",
+  "error" : "ERROR!, something went wrong, please try again....",
+  "internet_connection" : "Network Problem, please try again.",
+  "loading_event_please_wait" : "Loading event please wait.....",
+  "organiser" : "Organiser",
+  "fetching_event" : "Fetching event.....",
+  "going" : "Going",
+  "not_going" : "Not Going",
+  "cancel" : "Cancel"
 }

@@ -41,7 +41,7 @@ class ImageView extends StatelessWidget {
     //   );
     // }
     // else
-    if (path?.startsWith('http') ?? false) {
+    if (path?.startsWith('https') ?? false) {
       imageWidget = CachedNetworkImage(
         fit: fit,
         height: height,

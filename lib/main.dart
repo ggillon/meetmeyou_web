@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meetmeyou_web/constants/dimension_constants.dart';
@@ -30,6 +32,16 @@ Future<void> main() async {
   );
   await EasyLocalization.ensureInitialized();
   setupLocator();
+  // check if is running on Web
+  if (kIsWeb) {
+    // initialiaze the facebook javascript SDK
+    await FacebookAuth.i.webInitialize(
+      appId: "1321275768236042",
+      cookie: true,
+      xfbml: true,
+      version: "v13.0",
+    );
+  }
   runApp(EasyLocalization(
     supportedLocales: const [
       Locale('en'),

@@ -60,7 +60,13 @@ class EditProfileScreen extends StatelessWidget {
                       SizedBox(height: DimensionConstants.d20.h),
                       MediaQuery.of(context).size.width > 600 ?  profileRowTextFields() : profileColumnTextFields(),
                       SizedBox(height: DimensionConstants.d20.h),
-                      Align(
+                      MediaQuery.of(context).size.width < 600 ? Padding(
+                        padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d12.w),
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: saveBtn(context)
+                        ),
+                      ) :  Align(
                         alignment: Alignment.centerLeft,
                         child: saveBtn(context)
                       ),

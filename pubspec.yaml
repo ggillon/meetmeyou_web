@@ -55,6 +55,8 @@ dependencies:
     git:
       url: https://github.com/deepakrana0011/country_code_picker.git
       ref: main
+  dio: ^4.0.6
+  google_sign_in_web: ^0.10.2
 
 dev_dependencies:
   flutter_test:

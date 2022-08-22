@@ -11,7 +11,7 @@ import 'package:meetmeyou_web/widgets/image_view.dart';
 
 class CommonWidgets{
 
- static Widget commonAppBar(BuildContext context, bool navigate, {String? routeName}){
+ static Widget commonAppBar(BuildContext context, bool navigate, {String? routeName, String? userName}){
     return Card(
         margin: EdgeInsets.zero,
         child: Container(
@@ -28,7 +28,7 @@ class CommonWidgets{
                 Expanded(
                   child: Container(
                     alignment: Alignment.center,
-                    child:  Text("Welcome Sam Kalra")
+                    child:  Text("Welcome $userName")
                         .semiBoldText(ColorConstants.colorBlack,
                         DimensionConstants.d16.sp, TextAlign.left),
                   ),
@@ -74,11 +74,12 @@ class CommonWidgets{
 
  static Widget respondBtn(BuildContext context, String txt,
      Color bgColor, Color txtColor,
-     {VoidCallback? onTapFun, double? txtSize}) {
+     {VoidCallback? onTapFun, double? txtSize, double? width}) {
    return GestureDetector(
        onTap: onTapFun,
        child: Container(
          height: DimensionConstants.d40.h,
+         width: width ?? double.infinity,
          alignment: Alignment.center,
          padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d10.w, vertical: DimensionConstants.d5.h),
          decoration: BoxDecoration(

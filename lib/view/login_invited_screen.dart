@@ -2,12 +2,16 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:meetmeyou_web/constants/api_constants.dart';
 import 'package:meetmeyou_web/constants/color_constants.dart';
 import 'package:meetmeyou_web/constants/dimension_constants.dart';
 import 'package:meetmeyou_web/constants/image_constants.dart';
 import 'package:meetmeyou_web/constants/route_constants.dart';
+import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/extensions/all_extensions.dart';
+import 'package:meetmeyou_web/helper/date_time_helper.dart';
 import 'package:meetmeyou_web/locator.dart';
+import 'package:meetmeyou_web/models/event.dart';
 import 'package:meetmeyou_web/provider/login_invited_provider.dart';
 import 'package:meetmeyou_web/view/base_view.dart';
 import 'package:meetmeyou_web/widgets/image_view.dart';
@@ -20,15 +24,25 @@ class LoginInvitedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BaseView<LoginInvitedProvider>(
-        onModelReady: (provider){
+        onModelReady: (provider) async {
           this.provider = provider;
-          print(MediaQuery.of(context).size.width);
-       //   provider.login(context, "jd@gmail.com", "Qwerty@123");
+          await provider.getEvent(context, "vrwO-IxFr");
         },
         builder: (context, provider, _){
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
+          return provider.state == ViewState.Busy ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(),
+                SizedBox(height: DimensionConstants.d5.h),
+                Text("loading_event_please_wait".tr())
+                    .regularText(ColorConstants.primaryColor,
+                    DimensionConstants.d12.sp, TextAlign.left),
+              ],
+            ),
+          ) : SafeArea(
+            child:  SingleChildScrollView(
+              child:  Column(
                 children: [
                   Card(
                     margin: EdgeInsets.zero,
@@ -48,10 +62,12 @@ class LoginInvitedScreen extends StatelessWidget {
                           clipBehavior: Clip.none,
                           alignment: Alignment.bottomCenter,
                           children: [
-                            imageView(context),
+                            imageView(context, provider.eventResponse?.photoURL ?? ""),
                             Positioned(
                               bottom: -DimensionConstants.d75,
-                              child: titleDateLocationCard(context),
+                              child: titleDateLocationCard(context, provider.eventResponse?.title ?? "",  DateTime.fromMillisecondsSinceEpoch(provider.eventResponse?.start ?? "")
+                                  , DateTime.fromMillisecondsSinceEpoch(provider.eventResponse?.end ?? ""), provider.eventResponse?.location ?? "",
+                                  provider.eventResponse?.organiserName ?? ""),
                             )
                           ],
                         ),
@@ -61,7 +77,7 @@ class LoginInvitedScreen extends StatelessWidget {
                             DimensionConstants.d15.sp, TextAlign.left,
                             maxLines: 1, overflow: TextOverflow.ellipsis),
                         SizedBox(height: DimensionConstants.d10.h),
-                        Text("Hiiiiiiiiiiiiiiii")
+                        Text(provider.eventResponse?.description ?? "")
                             .regularText(ColorConstants.colorGray,
                             DimensionConstants.d12.sp, TextAlign.left,
                             maxLines: 5, overflow: TextOverflow.ellipsis),
@@ -99,7 +115,7 @@ class LoginInvitedScreen extends StatelessWidget {
     );
   }
 
-   Widget imageView(BuildContext context) {
+   Widget imageView(BuildContext context, String photoUrl) {
      return Card(
        margin: EdgeInsets.zero,
        shadowColor: ColorConstants.colorWhite,
@@ -107,28 +123,26 @@ class LoginInvitedScreen extends StatelessWidget {
        shape: RoundedRectangleBorder(
            borderRadius: BorderRadius.only(bottomLeft: Radius.circular(DimensionConstants.d12.r), bottomRight: Radius.circular(DimensionConstants.d12.r))),
        color: ColorConstants.colorLightGray,
-       child: Container(
+       child: SizedBox(
          height: MediaQuery.of(context).size.width > 1050 ? DimensionConstants.d325.h : DimensionConstants.d300.h,
          width: double.infinity,
          child: ClipRRect(
                    borderRadius:
                BorderRadius.only(bottomLeft: Radius.circular(DimensionConstants.d12.r), bottomRight: Radius.circular(DimensionConstants.d12.r)),
-                   child: const ImageView(
-                     path: "images/test.jpeg",
-                     fit: BoxFit.cover)
-                   // provider.eventDetail.photoUrlEvent == null ||
-                   //     provider.eventDetail.photoUrlEvent == ""
-                   //     ? Container(
-                   //   color: ColorConstants.primaryColor,
-                   //   height: DimensionConstants.d50.h,
-                   //   width: double.infinity,
-                   // )
-                   //     : ImageView(
-                   //   path: provider.eventDetail.photoUrlEvent,
-                   //   fit: BoxFit.cover,
-                   //   height: DimensionConstants.d50.h,
-                   //   width: double.infinity,
-                   // ),
+                   child:
+                   photoUrl == ""
+                       ?  ImageView(
+                     path: DEFAULT_EVENT_PHOTO_URL,
+                     fit: BoxFit.cover,
+                     height: DimensionConstants.d50.h,
+                     width: double.infinity,
+                   )
+                       : ImageView(
+                     path: photoUrl,
+                     fit: BoxFit.cover,
+                     height: DimensionConstants.d50.h,
+                     width: double.infinity,
+                   ),
                  ),
 
 
@@ -136,7 +150,7 @@ class LoginInvitedScreen extends StatelessWidget {
      );
    }
 
-   Widget titleDateLocationCard(BuildContext context) {
+   Widget titleDateLocationCard(BuildContext context, String eventTitle, DateTime startDate, DateTime endDate, String location, String organiserName) {
      return Container(
       // width: DimensionConstants.d200.w,
        padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d5.w),
@@ -150,14 +164,14 @@ class LoginInvitedScreen extends StatelessWidget {
              child: Row(
                //  mainAxisSize: MainAxisSize.min,
                children: [
-                 dateCard(),
+                 dateCard(startDate),
                  SizedBox(width: DimensionConstants.d5.w),
                  Column(
                    crossAxisAlignment: CrossAxisAlignment.start,
                    children: [
                      SizedBox(
                        width: MediaQuery.of(context).size.width > 1050 ? DimensionConstants.d175.w :  DimensionConstants.d225.w,
-                       child: Text("Birthdays")
+                       child: Text(eventTitle)
                            .boldText(ColorConstants.colorBlack,
                            DimensionConstants.d15.sp, TextAlign.left,
                            maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -169,7 +183,24 @@ class LoginInvitedScreen extends StatelessWidget {
                          SizedBox(width: DimensionConstants.d5.w),
                          SizedBox(
                            width:  MediaQuery.of(context).size.width > 1050 ? DimensionConstants.d150.w : DimensionConstants.d200.w,
-                           child: Text(" Thursday - 19:00 to 4 Aug 2022 (22:00)")
+                           child: Text(
+                               (startDate.toString().substring(0, 11)) ==
+                                   (endDate
+                                       .toString()
+                                       .substring(0, 11))
+                                   ? DateTimeHelper.getWeekDay(startDate) +
+                                   " - " +
+                                   DateTimeHelper.convertEventDateToTimeFormat(
+                                       startDate) +
+                                   " to " +
+                                   DateTimeHelper.convertEventDateToTimeFormat(
+                                       endDate)
+                                   : DateTimeHelper.getWeekDay(startDate) +
+                                   " - " +
+                                   DateTimeHelper.convertEventDateToTimeFormat(startDate) +
+                                   " to " +
+                                   DateTimeHelper.dateConversion(endDate) +
+                                   " ( ${DateTimeHelper.convertEventDateToTimeFormat(endDate)})")
                                .regularText(ColorConstants.colorGray, DimensionConstants.d12.sp, TextAlign.left, maxLines: 1, overflow: TextOverflow.ellipsis),
                          )
                        ],
@@ -181,7 +212,7 @@ class LoginInvitedScreen extends StatelessWidget {
                         SizedBox(width: DimensionConstants.d5.w),
                         SizedBox(
                           width:  MediaQuery.of(context).size.width > 1050 ? DimensionConstants.d150.w : DimensionConstants.d200.w,
-                          child: Text("Hii 5 Hotel, Jalan Kampung Air 5, Kota Kinabalu, Sabah, Malaysia")
+                          child: Text(location)
                               .regularText(ColorConstants.colorGray,
                               DimensionConstants.d12.sp, TextAlign.left,
                               maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -191,11 +222,11 @@ class LoginInvitedScreen extends StatelessWidget {
                      SizedBox(height: DimensionConstants.d5.h),
                      Row(
                        children: [
-                         Icon(Icons.person),
-                         SizedBox(width: DimensionConstants.d5.w),
+                         const Icon(Icons.person),
+                         SizedBox(width: DimensionConstants.d3.w),
                          Container(
                            width:  MediaQuery.of(context).size.width > 1050 ? DimensionConstants.d150.w : DimensionConstants.d200.w,
-                           child: Text("Akshay Kumar (Organiser)")
+                           child: Text("$organiserName (${"organiser".tr()})")
                                .regularText(ColorConstants.colorGray,
                                DimensionConstants.d12.sp, TextAlign.left,
                                maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -210,7 +241,7 @@ class LoginInvitedScreen extends StatelessWidget {
      );
    }
 
-   Widget dateCard() {
+   Widget dateCard(DateTime startDate) {
      return Card(
        shape: RoundedRectangleBorder(
            borderRadius: BorderRadius.circular(DimensionConstants.d12.r)),
@@ -223,10 +254,10 @@ class LoginInvitedScreen extends StatelessWidget {
          child: Column(
            mainAxisAlignment: MainAxisAlignment.center,
            children: [
-             Text("Aug")
+             Text(DateTimeHelper.getMonthByName(startDate))
                  .regularText(ColorConstants.primaryColor,
                  DimensionConstants.d15.sp, TextAlign.center),
-             Text("15")
+             Text(startDate.day <= 9 ? "0${startDate.day.toString()}" : startDate.day.toString())
                  .boldText(ColorConstants.primaryColor, DimensionConstants.d14.sp,
                  TextAlign.center)
            ],
@@ -254,10 +285,24 @@ class LoginInvitedScreen extends StatelessWidget {
               TextAlign.center),
           SizedBox(height: DimensionConstants.d10.h),
           socialMediaLoginBtn("sign_up_with_google".tr(), ImageConstants.ic_google, onTap: (){
-            context.go(RouteConstants.eventDetailScreen);
+          //  context.go(RouteConstants.eventDetailScreen);
+            provider.state == ViewState.Busy
+                ? const Center(
+              child:
+              CircularProgressIndicator(),
+            )
+                : provider.signInWithGoogle(context);
           }),
           SizedBox(height: DimensionConstants.d10.h),
-          socialMediaLoginBtn("sign_up_with_facebook".tr(), ImageConstants.ic_fb),
+          socialMediaLoginBtn("sign_up_with_facebook".tr(), ImageConstants.ic_fb, onTap: (){
+            //  context.go(RouteConstants.eventDetailScreen);
+            provider.state == ViewState.Busy
+                ? const Center(
+              child:
+              CircularProgressIndicator(),
+            )
+                : provider.signInWithFb(context);
+          }),
           SizedBox(height: DimensionConstants.d10.h),
           socialMediaLoginBtn("sign_up_with_apple".tr(), ImageConstants.ic_apple)
         ],
