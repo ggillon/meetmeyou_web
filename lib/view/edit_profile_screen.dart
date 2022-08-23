@@ -6,10 +6,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meetmeyou_web/constants/color_constants.dart';
 import 'package:meetmeyou_web/constants/dimension_constants.dart';
 import 'package:meetmeyou_web/constants/route_constants.dart';
+import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/extensions/all_extensions.dart';
 import 'package:meetmeyou_web/helper/common_widgets.dart';
 import 'package:meetmeyou_web/helper/decoration.dart';
 import 'package:meetmeyou_web/helper/validations.dart';
+import 'package:meetmeyou_web/locator.dart';
+import 'package:meetmeyou_web/provider/edit_profile_provider.dart';
+import 'package:meetmeyou_web/view/base_view.dart';
+import 'package:meetmeyou_web/widgets/image_view.dart';
 
 class EditProfileScreen extends StatelessWidget {
   EditProfileScreen({Key? key}) : super(key: key);
@@ -22,62 +27,87 @@ class EditProfileScreen extends StatelessWidget {
   final addressController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  EditProfileProvider provider = locator<EditProfileProvider>();
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        body: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CommonWidgets.commonAppBar(context, true, routeName: RouteConstants.viewProfileScreen),
-                SizedBox(height: DimensionConstants.d20.h),
-                Padding(
-                  padding: MediaQuery.of(context).size.width > 1050 ? EdgeInsets.symmetric(horizontal: DimensionConstants.d50.w) :  EdgeInsets.symmetric(horizontal: DimensionConstants.d20.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text("${"go_to_event".tr()} >>").mediumText(Colors.blue, DimensionConstants.d14.sp, TextAlign.left, underline: true),
-                      ),
-                      SizedBox(height: DimensionConstants.d10.h),
-                      SizedBox(
-                        width: DimensionConstants.d110,
-                        height: DimensionConstants.d120,
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.circular(DimensionConstants.d12.r),
-                            child: Container(
-                              color: ColorConstants.primaryColor,
-                              width: DimensionConstants.d110,
-                              height: DimensionConstants.d120,
-                            )
+    return Scaffold(
+      body: BaseView<EditProfileProvider>(
+        onModelReady: (provider){
+          this.provider = provider;
+          firstNameController.text = provider.userDetail.firstName.toString();
+          lastNameController.text = provider.userDetail.lastName.toString();
+          provider.countryCode = provider.userDetail.countryCode.toString();
+          phoneController.text = provider.userDetail.phone.toString();
+          emailController.text = provider.userDetail.email.toString();
+          addressController.text = provider.userDetail.address.toString();
+        },
+        builder: (context, provider, _){
+          return Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CommonWidgets.commonAppBar(context, true, routeName: RouteConstants.viewProfileScreen, userName: provider.userDetail.displayName),
+                  SizedBox(height: DimensionConstants.d20.h),
+                  Padding(
+                    padding: MediaQuery.of(context).size.width > 1050 ? EdgeInsets.symmetric(horizontal: DimensionConstants.d50.w) :  EdgeInsets.symmetric(horizontal: DimensionConstants.d20.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text("${"go_to_event".tr()} >>").mediumText(Colors.blue, DimensionConstants.d14.sp, TextAlign.left, underline: true),
                         ),
-                      ),
-                      SizedBox(height: DimensionConstants.d20.h),
-                      MediaQuery.of(context).size.width > 600 ?  profileRowTextFields() : profileColumnTextFields(),
-                      SizedBox(height: DimensionConstants.d20.h),
-                      MediaQuery.of(context).size.width < 600 ? Padding(
-                        padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d12.w),
-                        child: Align(
+                        SizedBox(height: DimensionConstants.d10.h),
+                        SizedBox(
+                          width: DimensionConstants.d110,
+                          height: DimensionConstants.d120,
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(DimensionConstants.d12.r),
+                              child: (provider.userDetail.profileUrl == null || provider.userDetail.profileUrl == "")
+                                  ? Container(
+                                color: ColorConstants.primaryColor,
+                                width: DimensionConstants.d110,
+                                height: DimensionConstants.d120,
+                              )
+                                  : ImageView(
+                                path: provider.userDetail.profileUrl,
+                                width: DimensionConstants.d110,
+                                height: DimensionConstants.d120,
+                                fit: BoxFit.cover,
+                              ),
+
+                          ),
+                        ),
+                        SizedBox(height: DimensionConstants.d20.h),
+                        MediaQuery.of(context).size.width > 600 ?  profileRowTextFields() : profileColumnTextFields(),
+                        SizedBox(height: DimensionConstants.d20.h),
+                        MediaQuery.of(context).size.width < 600 ? Padding(
+                          padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d12.w),
+                          child: provider.state == ViewState.Busy ? const Align(
+                              alignment: Alignment.center,
+                              child: CircularProgressIndicator()
+                          ) :  Align(
+                              alignment: Alignment.centerLeft,
+                              child: saveBtn(context)
+                          ),
+                        ) :  provider.state == ViewState.Busy ? const Align(
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator()
+                        ) :  Align(
                             alignment: Alignment.centerLeft,
                             child: saveBtn(context)
                         ),
-                      ) :  Align(
-                        alignment: Alignment.centerLeft,
-                        child: saveBtn(context)
-                      ),
-                      SizedBox(height: DimensionConstants.d20.h),
-                    ],
-                  ),
-                )
-              ],
+                        SizedBox(height: DimensionConstants.d20.h),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -213,16 +243,16 @@ class EditProfileScreen extends StatelessWidget {
   Widget countryCodePicker(){
     return  CountryCodePicker(
       onChanged: (value) {
-       // countryCodeController.text = value.dialCode.toString();
+        provider.countryCode = value.dialCode.toString();
       },
       textStyle:
       ViewDecoration.textFieldStyle(
           DimensionConstants.d14.sp,
           ColorConstants.colorBlack),
       initialSelection:
-      countryCodeController.text == ""
+      (provider.countryCode == "" || provider.countryCode == null)
           ? "US"
-          : countryCodeController.text,
+          : provider.userDetail.countryCode,
       //  favorite: ['US', 'GB', 'BE', 'FR', 'LU', 'AN', '+49'],
       showFlag: false,
       showFlagDialog: true,
@@ -286,7 +316,7 @@ class EditProfileScreen extends StatelessWidget {
     return GestureDetector(
         onTap: (){
           if(_formKey.currentState!.validate()){
-
+            provider.updateProfile(context, firstNameController.text, lastNameController.text, provider.countryCode.toString(), phoneController.text, emailController.text, addressController.text);
           }
         },
         child: Container(

@@ -1,16 +1,21 @@
+import 'dart:convert';
+
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meetmeyou_web/constants/route_constants.dart';
 import 'package:meetmeyou_web/dialog_helper.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/helper/common_widgets.dart';
+import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
 import 'package:meetmeyou_web/models/get_event_response.dart';
 import 'package:meetmeyou_web/models/user_detail.dart';
 import 'package:meetmeyou_web/provider/base_provider.dart';
 import 'package:meetmeyou_web/services/api.dart';
 import 'package:meetmeyou_web/services/mmy/mmy.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../services/fetch_data_exception.dart';
 import 'dart:io';
@@ -18,7 +23,6 @@ import 'dart:io';
 class LoginInvitedProvider extends BaseProvider{
 MMYEngine? mmyEngine;
 Api api = locator<Api>();
-UserDetail userDetail = locator<UserDetail>();
 
 GetEventResponse? eventResponse;
 
@@ -61,12 +65,14 @@ Future<void> signInWithGoogle(BuildContext context) async {
       userDetail.firstName = userProfile.firstName;
       userDetail.lastName = userProfile.lastName;
       userDetail.profileUrl = userProfile.photoURL;
+      SharedPreference.prefs!.setString(SharedPreference.currentUser, auth.currentUser.toString());
       updateData(false);
     //  userDetail.appleSignUpType = false;
       context.go(RouteConstants.eventDetailScreen);
     } else {
       updateData(false);
       userDetail.displayName = user.displayName;
+      SharedPreference.prefs!.setString(SharedPreference.currentUser, auth.currentUser.toString());
       context.go(RouteConstants.eventDetailScreen);
     //  userDetail.appleSignUpType = false;
     //  SharedPref.prefs?.setBool(SharedPref.IS_USER_LOGIN, true);
@@ -76,13 +82,13 @@ Future<void> signInWithGoogle(BuildContext context) async {
 }
 
 Future<void> signInWithFb(BuildContext context) async {
-  setState(ViewState.Busy);
+  updateData(true);
   var user = await auth.signInWithFacebook().catchError((e) {
-    setState(ViewState.Idle);
+    updateData(false);
     DialogHelper.showDialogWithOneButton(context, "error".tr(), e.message);
   });
   if (user != null) {
-    setState(ViewState.Busy);
+    updateData(true);
     mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
     var value = await mmyEngine!.isNew();
     if (value) {
@@ -92,10 +98,10 @@ Future<void> signInWithFb(BuildContext context) async {
       userDetail.firstName = userProfile.firstName;
       userDetail.lastName = userProfile.lastName;
       userDetail.profileUrl = userProfile.photoURL;
-      setState(ViewState.Idle);
+      updateData(false);
       context.go(RouteConstants.eventDetailScreen);
     } else {
-      setState(ViewState.Idle);
+      updateData(false);
       userDetail.displayName = user.displayName;
       context.go(RouteConstants.eventDetailScreen);
     }
@@ -103,47 +109,39 @@ Future<void> signInWithFb(BuildContext context) async {
 }
 
 
+Future<void> signInWithApple(BuildContext context) async {
+  updateData(true);
+  var user = await auth.signInWithApple().catchError((e) {
+    updateData(false);
+    DialogHelper.showDialogWithOneButton(context, "error".tr(), e.message);
+  });
+  if (user != null) {
+    updateData(true);
+    mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
+    var value = await mmyEngine!.isNew();
+    if (value) {
+      var userProfile = await mmyEngine!.createUserProfile();
+      await mmyEngine!.appleFirstSignIn();
+      print(userProfile);
+      updateData(false);
+      context.go(RouteConstants.eventDetailScreen);
+    } else {
+      updateData(false);
+      context.go(RouteConstants.eventDetailScreen);
+    }
+  }
+}
+
 Future<void> login(
-    BuildContext context, String? email, String? password) async {
-  setState(ViewState.Busy);
-  var user = await auth.signInEmailUser(email!, password!)
+    BuildContext context) async {
+  var user = await auth.signInEmailUser("d2@gmail.com", "Qwerty@123")
       .catchError((e) {
     setState(ViewState.Idle);
     DialogHelper.showMessage(context, e.message);
   });
-  if (user != null) {
-    setState(ViewState.Idle);
-   // getEvent(context, "rWzf-GYAY");
-  }
-}
 
+  SharedPreference.prefs!.setString(SharedPreference.currentUser, jsonEncode(user.));
 
-Future<void> createUser(
-    BuildContext context, String? email, String? password) async {
-  setState(ViewState.Busy);
-  var user = await auth.createEmailUser(email!, password!)
-      .catchError((e) {
-    setState(ViewState.Idle);
-    DialogHelper.showMessage(context, e.message);
-  });
-  if (user != null) {
-    setState(ViewState.Idle);
-  }
-}
-
-Future<void> getUserDetail(BuildContext context) async {
-  setState(ViewState.Busy);
-
-  mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
-  var userProfile = await mmyEngine!.getUserProfile().catchError((e) {
-    setState(ViewState.Idle);
-    DialogHelper.showMessage(context, e.message);
-  });
-
-  if(userProfile != null){
-   print("~~~~~~~~~~~~$userProfile");
-  }
-  setState(ViewState.Idle);
 }
 
 }

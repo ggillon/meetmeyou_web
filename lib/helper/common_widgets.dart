@@ -28,7 +28,7 @@ class CommonWidgets{
                 Expanded(
                   child: Container(
                     alignment: Alignment.center,
-                    child:  Text("Welcome $userName")
+                    child:  Text(userName == null ? "Welcome" : "Welcome $userName")
                         .semiBoldText(ColorConstants.colorBlack,
                         DimensionConstants.d16.sp, TextAlign.left),
                   ),
@@ -74,14 +74,14 @@ class CommonWidgets{
 
  static Widget respondBtn(BuildContext context, String txt,
      Color bgColor, Color txtColor,
-     {VoidCallback? onTapFun, double? txtSize, double? width}) {
+     {VoidCallback? onTapFun, double? txtSize, double? width, double? height, var padding}) {
    return GestureDetector(
        onTap: onTapFun,
        child: Container(
-         height: DimensionConstants.d40.h,
+         height: height ?? DimensionConstants.d40.h,
          width: width ?? double.infinity,
          alignment: Alignment.center,
-         padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d10.w, vertical: DimensionConstants.d5.h),
+         padding: padding ?? EdgeInsets.symmetric(horizontal: DimensionConstants.d10.w, vertical: DimensionConstants.d5.h),
          decoration: BoxDecoration(
              borderRadius:BorderRadius.circular(DimensionConstants.d8.r),
              color: bgColor

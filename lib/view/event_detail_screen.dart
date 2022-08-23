@@ -87,7 +87,7 @@ class EventDetailScreen extends StatelessWidget {
                               alignment: Alignment.center,
                               child: CommonWidgets.respondBtn(
                                   context,
-                                  "respond".tr(),
+                                  provider.getEventBtnStatus(provider.eventResponse, "provider.currentUser!.uid.toString()"),
                                   ColorConstants.primaryColor,
                                   ColorConstants.colorWhite, onTapFun: () {
                                 showDialog(
@@ -95,8 +95,12 @@ class EventDetailScreen extends StatelessWidget {
                                     context: context,
                                     builder: (BuildContext context) =>
                                         CustomDialog(
-                                          goingClick: () {},
-                                          notGoingClick: () {},
+                                          goingClick: () {
+                                          //  provider.replyToEvent(context, "vrwO-IxFr", EVENT_ATTENDING);
+                                          },
+                                          notGoingClick: () {
+                                         //   provider.replyToEvent(context, "vrwO-IxFr", EVENT_NOT_ATTENDING);
+                                          },
                                           cancelClick: () {
                                             Navigator.of(context).pop();
                                           },

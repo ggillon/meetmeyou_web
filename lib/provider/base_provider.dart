@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
+import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
+import 'package:meetmeyou_web/models/profile.dart';
+import 'package:meetmeyou_web/models/user_detail.dart';
 import 'package:meetmeyou_web/services/auth/auth.dart';
 
 class BaseProvider extends ChangeNotifier {
@@ -8,6 +13,7 @@ class BaseProvider extends ChangeNotifier {
   bool _isDisposed = false;
 
   AuthBase auth = locator<AuthBase>();
+  UserDetail userDetail = locator<UserDetail>();
 
   ViewState get state => _state;
 

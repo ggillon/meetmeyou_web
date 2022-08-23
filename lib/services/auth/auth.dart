@@ -12,7 +12,7 @@ abstract class AuthBase {
   Future<void> recoverEmailUser(String email,);
   Future<User?> signInWithGoogle();
   Future<User?> signInWithFacebook();
-  Future<User?> signInWithApple();
+  Future<UserCredential> signInWithApple();
   bool emailCheckCode(String email, String OTP);
   Future<void> signOut();
   Stream<User?> authStateChanges();
@@ -60,7 +60,7 @@ class Auth implements AuthBase {
 
   @override
   Future<User?> signInWithGoogle() async {
-    await signOut();
+  //  await signOut();
     try {
       UserCredential userCredential;
       OAuthCredential googleAuthCredential;
@@ -90,7 +90,7 @@ class Auth implements AuthBase {
 
   @override
   Future<User?> signInWithFacebook() async {
-    await signOut();
+  //  await signOut();
     if(kIsWeb) {
       // Create a new provider
       FacebookAuthProvider facebookProvider = FacebookAuthProvider();
@@ -129,18 +129,27 @@ class Auth implements AuthBase {
     }
   }
 
-  @override
-  Future<User?> signInWithApple() async {
-    try {
-      final result = await FirebaseAuthOAuth().openSignInFlow(
-          'apple.com', ['email', 'fullName'], {"locale": "en"});
-      return result;
-    } catch (error) {
-      print(error);
-      throw FirebaseAuthException(
-          message: 'Apple sign in failed', code: 'ERROR_APPLE_SIGN_IN');
-    }
-  }
+   @override
+  // Future<User?> signInWithApple() async {
+  //   try {
+  //     final result = await FirebaseAuthOAuth().openSignInFlow(
+  //         'apple.com', ['email', 'fullName'], {"locale": "en"});
+  //     return result;
+  //   } catch (error) {
+  //     print(error);
+  //     throw FirebaseAuthException(
+  //         message: 'Apple sign in failed', code: 'ERROR_APPLE_SIGN_IN');
+  //   }
+  // }
+   Future<UserCredential> signInWithApple() async {
+     // Create and configure an OAuthProvider for Sign In with Apple.
+     final provider = OAuthProvider("apple.com")
+       ..addScope('email')
+       ..addScope('name');
+
+     // Sign in the user with Firebase.
+     return await FirebaseAuth.instance.signInWithPopup(provider);
+   }
 
   @override
   bool emailCheckCode(String email, String OTP) {

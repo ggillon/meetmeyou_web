@@ -15,6 +15,7 @@ import 'package:meetmeyou_web/models/event.dart';
 import 'package:meetmeyou_web/provider/login_invited_provider.dart';
 import 'package:meetmeyou_web/view/base_view.dart';
 import 'package:meetmeyou_web/widgets/image_view.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class LoginInvitedScreen extends StatelessWidget {
    LoginInvitedScreen({Key? key}) : super(key: key);
@@ -286,7 +287,7 @@ class LoginInvitedScreen extends StatelessWidget {
           SizedBox(height: DimensionConstants.d10.h),
           socialMediaLoginBtn("sign_up_with_google".tr(), ImageConstants.ic_google, onTap: (){
           //  context.go(RouteConstants.eventDetailScreen);
-            provider.state == ViewState.Busy
+            provider.data == true
                 ? const Center(
               child:
               CircularProgressIndicator(),
@@ -296,7 +297,7 @@ class LoginInvitedScreen extends StatelessWidget {
           SizedBox(height: DimensionConstants.d10.h),
           socialMediaLoginBtn("sign_up_with_facebook".tr(), ImageConstants.ic_fb, onTap: (){
             //  context.go(RouteConstants.eventDetailScreen);
-            provider.state == ViewState.Busy
+            provider.data == true
                 ? const Center(
               child:
               CircularProgressIndicator(),
@@ -304,7 +305,15 @@ class LoginInvitedScreen extends StatelessWidget {
                 : provider.signInWithFb(context);
           }),
           SizedBox(height: DimensionConstants.d10.h),
-          socialMediaLoginBtn("sign_up_with_apple".tr(), ImageConstants.ic_apple)
+          socialMediaLoginBtn("sign_up_with_apple".tr(), ImageConstants.ic_apple, onTap: (){
+            //  context.go(RouteConstants.eventDetailScreen);
+            provider.data == true
+                ? const Center(
+              child:
+              CircularProgressIndicator(),
+            )
+                : provider.login(context);
+          })
         ],
       ),
     );

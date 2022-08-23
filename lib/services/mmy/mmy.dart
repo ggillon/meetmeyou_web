@@ -43,6 +43,10 @@ abstract class MMYEngine {
   Future<bool> isNew();
   /// Update the profile Profile
   Future<Profile> updateProfilePicture(File file);
+  /// Apple Sign in profile creation
+  Future<Profile> appleFirstSignIn();
+  /// Apple Sign in profile creation
+  Future<bool> filledProfile();
 
   /// CONTACT ///
 
@@ -104,6 +108,19 @@ class MMY implements MMYEngine {
    String photoURL = await storageLib.storeProfilePicture(file, uid: _currentUser.uid);
    return profileLib.updateProfile(_currentUser, photoUrl: photoURL);
   }
+
+  @override
+  Future<Profile> appleFirstSignIn() {
+    return profileLib.createAnonProfileFromUser(_currentUser);
+  }
+
+  @override
+  Future<bool> filledProfile() async {
+    bool output;
+    output = !((await profileLib.getUserProfile(_currentUser)).parameters['Anon']);
+    return output;
+  }
+
 
   @override
   Future<Contact> getContact(String cid) async {

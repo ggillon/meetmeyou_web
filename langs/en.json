@@ -31,5 +31,7 @@
   "fetching_event" : "Fetching event.....",
   "going" : "Going",
   "not_going" : "Not Going",
-  "cancel" : "Cancel"
+  "cancel" : "Cancel",
+  "getting_profile" : "Getting profile.....",
+  "cancelled" : "Cancelled"
 }

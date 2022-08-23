@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:meetmeyou_web/constants/dimension_constants.dart';
 import 'package:meetmeyou_web/constants/route_constants.dart';
 import 'package:meetmeyou_web/constants/string_constants.dart';
+import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
 import 'package:meetmeyou_web/services/auth/auth.dart';
 import 'package:meetmeyou_web/view/edit_profile_screen.dart';
@@ -16,6 +17,7 @@ import 'package:meetmeyou_web/view/login_invited_screen.dart';
 import 'package:meetmeyou_web/view/view_profile_screen.dart';
 import 'package:meetmeyou_web/widgets/error_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +33,7 @@ Future<void> main() async {
     ),
   );
   await EasyLocalization.ensureInitialized();
+  SharedPreference.prefs = await SharedPreferences.getInstance();
   setupLocator();
   // check if is running on Web
   if (kIsWeb) {
