@@ -10,7 +10,7 @@ import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/helper/common_widgets.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
-import 'package:meetmeyou_web/models/get_event_response.dart';
+import 'package:meetmeyou_web/api_models/get_event_response.dart';
 import 'package:meetmeyou_web/models/user_detail.dart';
 import 'package:meetmeyou_web/provider/base_provider.dart';
 import 'package:meetmeyou_web/services/api.dart';
@@ -22,10 +22,8 @@ import 'dart:io';
 
 class LoginInvitedProvider extends BaseProvider{
 MMYEngine? mmyEngine;
-Api api = locator<Api>();
 
 GetEventResponse? eventResponse;
-
 
 Future<bool> getEvent(BuildContext context, String eid) async{
   setState(ViewState.Busy);
@@ -33,12 +31,13 @@ Future<bool> getEvent(BuildContext context, String eid) async{
     var model = await api.getEvent(eid);
     if(model != null){
       eventResponse = model;
+      SharedPreference.prefs!.setString(SharedPreference.eventId, model.eid.toString());
     }
     setState(ViewState.Idle);
     return true;
   } on FetchDataException catch (c) {
     setState(ViewState.Idle);
-    DialogHelper.showMessage(context, "error_in_packing_item".tr());
+    DialogHelper.showMessage(context, "error".tr());
     return false;
   } on SocketException catch (c) {
     setState(ViewState.Idle);
@@ -65,14 +64,14 @@ Future<void> signInWithGoogle(BuildContext context) async {
       userDetail.firstName = userProfile.firstName;
       userDetail.lastName = userProfile.lastName;
       userDetail.profileUrl = userProfile.photoURL;
-      SharedPreference.prefs!.setString(SharedPreference.currentUser, auth.currentUser.toString());
+      SharedPreference.prefs!.setString(SharedPreference.userId, userProfile.uid.toString());
       updateData(false);
     //  userDetail.appleSignUpType = false;
       context.go(RouteConstants.eventDetailScreen);
     } else {
       updateData(false);
       userDetail.displayName = user.displayName;
-      SharedPreference.prefs!.setString(SharedPreference.currentUser, auth.currentUser.toString());
+      SharedPreference.prefs!.setString(SharedPreference.userId, user.uid.toString());
       context.go(RouteConstants.eventDetailScreen);
     //  userDetail.appleSignUpType = false;
     //  SharedPref.prefs?.setBool(SharedPref.IS_USER_LOGIN, true);
@@ -99,10 +98,12 @@ Future<void> signInWithFb(BuildContext context) async {
       userDetail.lastName = userProfile.lastName;
       userDetail.profileUrl = userProfile.photoURL;
       updateData(false);
+      SharedPreference.prefs!.setString(SharedPreference.userId, userProfile.uid.toString());
       context.go(RouteConstants.eventDetailScreen);
     } else {
       updateData(false);
       userDetail.displayName = user.displayName;
+      SharedPreference.prefs!.setString(SharedPreference.userId, user.uid.toString());
       context.go(RouteConstants.eventDetailScreen);
     }
   }
@@ -124,9 +125,11 @@ Future<void> signInWithApple(BuildContext context) async {
       await mmyEngine!.appleFirstSignIn();
       print(userProfile);
       updateData(false);
+      SharedPreference.prefs!.setString(SharedPreference.userId, userProfile.uid.toString());
       context.go(RouteConstants.eventDetailScreen);
     } else {
       updateData(false);
+      SharedPreference.prefs!.setString(SharedPreference.userId, user.uid.toString());
       context.go(RouteConstants.eventDetailScreen);
     }
   }
@@ -140,7 +143,7 @@ Future<void> login(
     DialogHelper.showMessage(context, e.message);
   });
 
-  SharedPreference.prefs!.setString(SharedPreference.currentUser, jsonEncode(user.));
+  //SharedPreference.prefs!.setString(SharedPreference.currentUser, jsonEncode(user.));
 
 }
 

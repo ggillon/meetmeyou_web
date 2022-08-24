@@ -10,6 +10,7 @@ import 'package:meetmeyou_web/constants/route_constants.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/extensions/all_extensions.dart';
 import 'package:meetmeyou_web/helper/date_time_helper.dart';
+import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
 import 'package:meetmeyou_web/models/event.dart';
 import 'package:meetmeyou_web/provider/login_invited_provider.dart';
@@ -27,7 +28,7 @@ class LoginInvitedScreen extends StatelessWidget {
       body: BaseView<LoginInvitedProvider>(
         onModelReady: (provider) async {
           this.provider = provider;
-          await provider.getEvent(context, "vrwO-IxFr");
+          await provider.getEvent(context, "GFgy-OFBz");
         },
         builder: (context, provider, _){
           return provider.state == ViewState.Busy ? Center(
@@ -286,13 +287,14 @@ class LoginInvitedScreen extends StatelessWidget {
               TextAlign.center),
           SizedBox(height: DimensionConstants.d10.h),
           socialMediaLoginBtn("sign_up_with_google".tr(), ImageConstants.ic_google, onTap: (){
-          //  context.go(RouteConstants.eventDetailScreen);
-            provider.data == true
-                ? const Center(
-              child:
-              CircularProgressIndicator(),
-            )
-                : provider.signInWithGoogle(context);
+            SharedPreference.prefs!.setString(SharedPreference.userId, "ZKsRCGO51CWRh4NslebxT3ZsEBY2");
+            context.go(RouteConstants.eventDetailScreen);
+          //   provider.data == true
+          //       ? const Center(
+          //     child:
+          //     CircularProgressIndicator(),
+          //   )
+          //       : provider.signInWithGoogle(context);
           }),
           SizedBox(height: DimensionConstants.d10.h),
           socialMediaLoginBtn("sign_up_with_facebook".tr(), ImageConstants.ic_fb, onTap: (){
@@ -312,7 +314,7 @@ class LoginInvitedScreen extends StatelessWidget {
               child:
               CircularProgressIndicator(),
             )
-                : provider.login(context);
+                : provider.signInWithApple(context);
           })
         ],
       ),

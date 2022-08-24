@@ -12,6 +12,9 @@ class GetEventResponse {
   dynamic start;
   dynamic end;
 
+  InvitedContacts? invitedContacts;
+  QuestionForm? form;
+
   GetEventResponse(
       {this.timeStamp,
         this.eventType,
@@ -38,5 +41,40 @@ class GetEventResponse {
     title = json['title'];
     start = json['start'];
     end = json['end'];
+    invitedContacts = json['invitedContacts'] != null ? InvitedContacts(json['invitedContacts']) : null;
+    form = json['form'] != null ? QuestionForm(json['form']) : null;
   }
 }
+
+class InvitedContacts{
+  List<String> keysList = [];
+  List<String> valuesList = [];
+
+  InvitedContacts(Map<String, dynamic> json){
+
+    for (var key in json.keys) {
+      keysList.add(key);
+    }
+
+    for (var value in json.values) {
+      valuesList.add(value);
+    }
+  }
+}
+
+class QuestionForm{
+  List<String> keysList = [];
+  List<String> valuesList = [];
+
+  QuestionForm(Map<String, dynamic> json){
+
+    for (var key in json.keys) {
+      keysList.add(key);
+    }
+
+    for (var value in json.values) {
+      valuesList.add(value);
+    }
+  }
+}
+

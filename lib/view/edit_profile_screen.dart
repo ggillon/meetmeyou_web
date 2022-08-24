@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meetmeyou_web/constants/color_constants.dart';
 import 'package:meetmeyou_web/constants/dimension_constants.dart';
 import 'package:meetmeyou_web/constants/route_constants.dart';
@@ -10,6 +11,7 @@ import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/extensions/all_extensions.dart';
 import 'package:meetmeyou_web/helper/common_widgets.dart';
 import 'package:meetmeyou_web/helper/decoration.dart';
+import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/helper/validations.dart';
 import 'package:meetmeyou_web/locator.dart';
 import 'package:meetmeyou_web/provider/edit_profile_provider.dart';
@@ -32,14 +34,15 @@ class EditProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BaseView<EditProfileProvider>(
-        onModelReady: (provider){
+        onModelReady: (provider) async {
           this.provider = provider;
-          firstNameController.text = provider.userDetail.firstName.toString();
-          lastNameController.text = provider.userDetail.lastName.toString();
-          provider.countryCode = provider.userDetail.countryCode.toString();
-          phoneController.text = provider.userDetail.phone.toString();
-          emailController.text = provider.userDetail.email.toString();
-          addressController.text = provider.userDetail.address.toString();
+          firstNameController.text = SharedPreference.prefs!.getString(SharedPreference.firstName) ?? "";
+          lastNameController.text = SharedPreference.prefs!.getString(SharedPreference.lastName) ?? "";
+          provider.countryCode = SharedPreference.prefs!.getString(SharedPreference.countryCode) ?? "";
+          phoneController.text = SharedPreference.prefs!.getString(SharedPreference.phone) ?? "";
+          emailController.text = SharedPreference.prefs!.getString(SharedPreference.email) ?? "";
+          addressController.text = SharedPreference.prefs!.getString(SharedPreference.address) ?? "";
+
         },
         builder: (context, provider, _){
           return Form(
@@ -48,16 +51,21 @@ class EditProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CommonWidgets.commonAppBar(context, true, routeName: RouteConstants.viewProfileScreen, userName: provider.userDetail.displayName),
+                  CommonWidgets.commonAppBar(context, true, routeName: RouteConstants.viewProfileScreen, userName: SharedPreference.prefs!.getString(SharedPreference.displayName) ?? "",),
                   SizedBox(height: DimensionConstants.d20.h),
                   Padding(
                     padding: MediaQuery.of(context).size.width > 1050 ? EdgeInsets.symmetric(horizontal: DimensionConstants.d50.w) :  EdgeInsets.symmetric(horizontal: DimensionConstants.d20.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text("${"go_to_event".tr()} >>").mediumText(Colors.blue, DimensionConstants.d14.sp, TextAlign.left, underline: true),
+                        GestureDetector(
+                          onTap: (){
+                            context.go(RouteConstants.eventDetailScreen);
+                          },
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text("${"go_to_event".tr()} >>").mediumText(Colors.blue, DimensionConstants.d14.sp, TextAlign.left, underline: true),
+                          ),
                         ),
                         SizedBox(height: DimensionConstants.d10.h),
                         SizedBox(
@@ -65,14 +73,14 @@ class EditProfileScreen extends StatelessWidget {
                           height: DimensionConstants.d120,
                           child: ClipRRect(
                               borderRadius: BorderRadius.circular(DimensionConstants.d12.r),
-                              child: (provider.userDetail.profileUrl == null || provider.userDetail.profileUrl == "")
+                              child: (SharedPreference.prefs!.getString(SharedPreference.profileUrl) == null || SharedPreference.prefs!.getString(SharedPreference.profileUrl) == "")
                                   ? Container(
                                 color: ColorConstants.primaryColor,
                                 width: DimensionConstants.d110,
                                 height: DimensionConstants.d120,
                               )
                                   : ImageView(
-                                path: provider.userDetail.profileUrl,
+                                path: SharedPreference.prefs!.getString(SharedPreference.profileUrl),
                                 width: DimensionConstants.d110,
                                 height: DimensionConstants.d120,
                                 fit: BoxFit.cover,
@@ -195,7 +203,7 @@ class EditProfileScreen extends StatelessWidget {
 
   Widget firstNameTextField(){
     return TextFormField(
-      controller: firstNameController,
+      controller: firstNameController..text = SharedPreference.prefs!.getString(SharedPreference.firstName) ?? "",
       decoration: ViewDecoration.inputDecorationWithCurve("first_name".tr()),
       style: ViewDecoration.textFieldStyle(DimensionConstants.d15.sp, ColorConstants.colorBlack),
       keyboardType: TextInputType.name,
@@ -213,7 +221,7 @@ class EditProfileScreen extends StatelessWidget {
 
   Widget lastNameTextField(){
     return TextFormField(
-      controller: lastNameController,
+      controller: lastNameController..text = SharedPreference.prefs!.getString(SharedPreference.lastName) ?? "",
       decoration: ViewDecoration.inputDecorationWithCurve("last_name".tr()),
       style: ViewDecoration.textFieldStyle(DimensionConstants.d15.sp, ColorConstants.colorBlack),
       keyboardType: TextInputType.name,
@@ -250,9 +258,9 @@ class EditProfileScreen extends StatelessWidget {
           DimensionConstants.d14.sp,
           ColorConstants.colorBlack),
       initialSelection:
-      (provider.countryCode == "" || provider.countryCode == null)
+      (SharedPreference.prefs!.getString(SharedPreference.countryCode) == null)
           ? "US"
-          : provider.userDetail.countryCode,
+          :  SharedPreference.prefs!.getString(SharedPreference.countryCode),
       //  favorite: ['US', 'GB', 'BE', 'FR', 'LU', 'AN', '+49'],
       showFlag: false,
       showFlagDialog: true,
@@ -266,7 +274,7 @@ class EditProfileScreen extends StatelessWidget {
       inputFormatters: <TextInputFormatter>[
         FilteringTextInputFormatter.digitsOnly,
       ],
-      controller: phoneController,
+      controller: phoneController..text = SharedPreference.prefs!.getString(SharedPreference.phone) ?? "",
       decoration: ViewDecoration.inputDecorationWithCurve("phone_no".tr()),
       style: ViewDecoration.textFieldStyle(DimensionConstants.d15.sp, ColorConstants.colorBlack),
       keyboardType: TextInputType.phone,
@@ -284,7 +292,7 @@ class EditProfileScreen extends StatelessWidget {
 
   Widget emailTextField(){
     return TextFormField(
-      controller: emailController,
+      controller: emailController..text = SharedPreference.prefs!.getString(SharedPreference.email) ?? "",
       decoration: ViewDecoration.inputDecorationWithCurve("email".tr()),
       style: ViewDecoration.textFieldStyle(DimensionConstants.d15.sp, ColorConstants.colorBlack),
       keyboardType: TextInputType.emailAddress,
@@ -304,7 +312,7 @@ class EditProfileScreen extends StatelessWidget {
 
   Widget addressTextField(){
     return TextFormField(
-      controller: addressController,
+      controller: addressController..text = SharedPreference.prefs!.getString(SharedPreference.address) ?? "",
       decoration: ViewDecoration.inputDecorationWithCurve("address".tr()),
       style: ViewDecoration.textFieldStyle(DimensionConstants.d15.sp, ColorConstants.colorBlack),
       keyboardType: TextInputType.streetAddress,
@@ -316,7 +324,14 @@ class EditProfileScreen extends StatelessWidget {
     return GestureDetector(
         onTap: (){
           if(_formKey.currentState!.validate()){
-            provider.updateProfile(context, firstNameController.text, lastNameController.text, provider.countryCode.toString(), phoneController.text, emailController.text, addressController.text);
+            provider.setUserProfile(context, firstNameController.text, lastNameController.text, provider.userDetail.profileUrl.toString(), emailController.text,
+                phoneController.text, addressController.text, provider.countryCode == null ?  (SharedPreference.prefs!.getString(SharedPreference.countryCode) ?? "") : provider.countryCode.toString()).then((value){
+                  if(value == true){
+                    context.go(RouteConstants.viewProfileScreen);
+                  }
+            });
+            // provider.updateProfile(context, firstNameController.text, lastNameController.text,
+            //     provider.countryCode.toString(), phoneController.text, emailController.text, addressController.text);
           }
         },
         child: Container(

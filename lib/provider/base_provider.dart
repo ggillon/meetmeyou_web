@@ -6,6 +6,7 @@ import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
 import 'package:meetmeyou_web/models/profile.dart';
 import 'package:meetmeyou_web/models/user_detail.dart';
+import 'package:meetmeyou_web/services/api.dart';
 import 'package:meetmeyou_web/services/auth/auth.dart';
 
 class BaseProvider extends ChangeNotifier {
@@ -14,6 +15,7 @@ class BaseProvider extends ChangeNotifier {
 
   AuthBase auth = locator<AuthBase>();
   UserDetail userDetail = locator<UserDetail>();
+  Api api = locator<Api>();
 
   ViewState get state => _state;
 

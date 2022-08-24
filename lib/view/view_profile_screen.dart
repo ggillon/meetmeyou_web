@@ -22,7 +22,7 @@ class ViewProfileScreen extends StatelessWidget {
     return Scaffold(
       body: BaseView<ViewProfileProvider>(
         onModelReady: (provider){
-          provider.getUserDetail(context);
+          provider.getUserProfile(context);
         },
         builder: (context, provider, _){
           return provider.state == ViewState.Busy ? Center(
@@ -47,7 +47,12 @@ class ViewProfileScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("${"go_to_event".tr()} >>").mediumText(Colors.blue, DimensionConstants.d14.sp, TextAlign.left, underline: true),
+                      GestureDetector(
+                        onTap: (){
+                          context.go(RouteConstants.eventDetailScreen);
+                        },
+                        child:Text("${"go_to_event".tr()} >>").mediumText(Colors.blue, DimensionConstants.d14.sp, TextAlign.left, underline: true),
+                      ),
                       SizedBox(height: DimensionConstants.d10.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

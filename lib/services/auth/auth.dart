@@ -12,7 +12,7 @@ abstract class AuthBase {
   Future<void> recoverEmailUser(String email,);
   Future<User?> signInWithGoogle();
   Future<User?> signInWithFacebook();
-  Future<UserCredential> signInWithApple();
+  Future<User?> signInWithApple();
   bool emailCheckCode(String email, String OTP);
   Future<void> signOut();
   Stream<User?> authStateChanges();
@@ -141,14 +141,15 @@ class Auth implements AuthBase {
   //         message: 'Apple sign in failed', code: 'ERROR_APPLE_SIGN_IN');
   //   }
   // }
-   Future<UserCredential> signInWithApple() async {
+   Future<User?> signInWithApple() async {
      // Create and configure an OAuthProvider for Sign In with Apple.
      final provider = OAuthProvider("apple.com")
        ..addScope('email')
        ..addScope('name');
 
      // Sign in the user with Firebase.
-     return await FirebaseAuth.instance.signInWithPopup(provider);
+     final userCred =  await _auth.signInWithPopup(provider);
+     return userCred.user;
    }
 
   @override
