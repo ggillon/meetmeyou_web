@@ -28,7 +28,7 @@ class LoginInvitedScreen extends StatelessWidget {
       body: BaseView<LoginInvitedProvider>(
         onModelReady: (provider) async {
           this.provider = provider;
-          await provider.getEvent(context, "GFgy-OFBz");
+          await provider.getEvent(context, "ePec-pXgm");
         },
         builder: (context, provider, _){
           return provider.state == ViewState.Busy ? Center(

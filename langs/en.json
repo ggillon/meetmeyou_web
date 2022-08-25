@@ -37,5 +37,8 @@
   "event_form_questionnaire" : "Event Form Questionnaire",
   "answer" : "Answer",
   "submit_answers" : "Submit answers",
-  "answer_required" : "Answer required"
+  "answer_required" : "Answer required",
+  "which_days_could_you_attend" : "Which days could you attend ?",
+  "submit" : "Submit",
+  "submitted" : "Submitted"
 }

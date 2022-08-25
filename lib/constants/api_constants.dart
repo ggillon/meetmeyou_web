@@ -8,4 +8,7 @@ class ApiConstants{
   static const String unAttendEvent = 'event-unAttend';
   static const String setEventAnswer = 'event-setAnswer';
   static const String getEventAnswer = 'event-getAnswer';
+  static const String getMultiDates = 'event-getMultiDates';
+  static const String attendMultiDate = 'event-attendDates';
+  static const String unAttendMultiDate = 'event-unAttendDates';
 }

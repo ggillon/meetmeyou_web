@@ -40,6 +40,23 @@ class EventDetailScreen extends StatelessWidget {
       onModelReady: (provider) async {
         this.provider = provider;
         await provider.getEvent(context, provider.eventId.toString());
+
+        // for questionnaire answers
+       if(provider.respondBtnStatus == "going" && provider.questionnaireKeysList.isNotEmpty){
+         await provider.getAnswersQuestionnaireForm(context);
+         if(provider.answers != null){
+           answer1Controller.text = provider.answers!.s1Text!;
+           answer2Controller.text = provider.answers!.s2Text!;
+           answer3Controller.text = provider.answers!.s3Text!;
+           answer4Controller.text = provider.answers!.s4Text!;
+           answer5Controller.text = provider.answers!.s5Text!;
+         }
+       }
+
+       // for getting multi dates
+        if(provider.multipleDates){
+          await provider.getMultiDates(context);
+        }
       },
       builder: (context, provider, _) {
         return provider.state == ViewState.Busy
@@ -86,7 +103,8 @@ class EventDetailScreen extends StatelessWidget {
                               ],
                             ),
                             SizedBox(height: DimensionConstants.d85.h),
-                            Align(
+                           provider.multipleDates ? multiAttendDateUi(context, provider)
+                               : Align(
                               alignment: Alignment.center,
                               child: CommonWidgets.respondBtn(
                                   context,
@@ -325,7 +343,7 @@ class EventDetailScreen extends StatelessWidget {
         builder: (BuildContext context) =>
             CustomDialog(
               goingClick: () {
-                if(provider.questionnaireKeysList.isNotEmpty){
+                if(provider.questionsList.isNotEmpty){
                   Navigator.of(context).pop();
                   alertForQuestionnaireAnswers(context, provider.questionsList, provider);
                 } else{
@@ -341,6 +359,146 @@ class EventDetailScreen extends StatelessWidget {
                 Navigator.of(context).pop();
               },
             ));
+  }
+
+
+  /// multi dates ~~~~~~~
+  ///
+  Widget multiAttendDateUi(
+      BuildContext context, EventDetailProvider provider) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          alignment: Alignment.centerLeft,
+          child: Text("which_days_could_you_attend".tr()).boldText(
+              ColorConstants.colorBlack,
+              DimensionConstants.d13.sp,
+              TextAlign.left),
+        ),
+        SizedBox(height: DimensionConstants.d15.h),
+        // provider.multiDates.length <= 6
+        //     ?
+        SingleChildScrollView(
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: DimensionConstants.d1.h),
+             width: DimensionConstants.d440,
+              height:  DimensionConstants.d300,
+            child: GridView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: provider.multiDates.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 10.0,
+                  mainAxisSpacing: 10.0),
+              itemBuilder: (context, index) {
+                //  var value = provider.dateOptionStatus(context, provider.eventDetail.event!.eid,  provider.multipleDate[index].did);
+                return multiAttendDateCard(context, provider, index);
+              },
+            ),
+          ),
+        ),
+        //     :
+        // Container(
+        //   margin: EdgeInsets.symmetric(horizontal: DimensionConstants.d5.h),
+        //   width: DimensionConstants.d440,
+        //   height: DimensionConstants.d125,
+        //   child: ListView.builder(
+        //       scrollDirection: Axis.horizontal,
+        //       physics: const AlwaysScrollableScrollPhysics(),
+        //       shrinkWrap: true,
+        //       itemCount: provider.multiDates.length,
+        //       itemBuilder: (context, index) {
+        //         return multiAttendDateCard(context, provider, index);
+        //       }),
+        // ),
+        SizedBox(height: DimensionConstants.d5.h),
+        submitMultiDateBtn(context, provider)
+      ],
+    );
+  }
+
+  Widget multiAttendDateCard(BuildContext context, EventDetailProvider provider, int index) {
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: provider.answerMultiDate == true ? (){} : (){
+             provider.selectedMultiDateIndex = index;
+            if(provider.didAttendedDate.contains(provider.multiDates[index].did)){
+              provider.didAttendedDate.remove(provider.multiDates[index].did);
+              provider.didsOfMultiDateSelected.add(provider.multiDates[index].did.toString());
+            } else{
+              provider.didAttendedDate.add(provider.multiDates[index].did.toString());
+              provider.didsOfMultiDateSelected.remove(provider.multiDates[index].did);
+            }
+            provider.updateLoadingStatus(true);
+          },
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: DimensionConstants.d1.h, horizontal: DimensionConstants.d1.w),
+            padding: EdgeInsets.symmetric(vertical: DimensionConstants.d1.h, horizontal: DimensionConstants.d2.w),
+            width: DimensionConstants.d100,
+            height: DimensionConstants.d90,
+            decoration: BoxDecoration(
+                color: ColorConstants.colorLightGray,
+                borderRadius: BorderRadius.circular(DimensionConstants.d8.r),
+                boxShadow: [
+                  BoxShadow(color:
+                  provider.didAttendedDate.contains(provider.multiDates[index].did)
+                      ? ColorConstants.primaryColor : ColorConstants.colorWhitishGray,
+                      spreadRadius: 1)
+                ]),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(height: DimensionConstants.d2.h),
+                Text("${DateTimeHelper.getMonthByName(DateTime.fromMillisecondsSinceEpoch(provider.multiDates[index].start!.toInt()))} "
+                    " ${DateTime.fromMillisecondsSinceEpoch(provider.multiDates[index].start!.toInt()).year}")
+                    .semiBoldText(Colors.deepOrangeAccent, DimensionConstants.d12.sp, TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
+                SizedBox(height: DimensionConstants.d2.h),
+                Text(DateTime.fromMillisecondsSinceEpoch(provider.multiDates[index].start!.toInt()).day.toString())
+                    .boldText(ColorConstants.colorBlack, DimensionConstants.d15.sp, TextAlign.center),
+                SizedBox(height: DimensionConstants.d2.h),
+                Text("${DateTimeHelper.convertEventDateToTimeFormat(DateTime.fromMillisecondsSinceEpoch(provider.multiDates[index].start!.toInt()))}")
+                    .regularText(ColorConstants.colorGray, 10.5, TextAlign.center,
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
+                SizedBox(height: DimensionConstants.d2.h),
+              ],
+            ),
+          ),
+
+        ),
+        SizedBox(width: DimensionConstants.d5.w)
+      ],
+    );
+  }
+
+  Widget submitMultiDateBtn(BuildContext context, EventDetailProvider provider) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: provider.answerMultiDate == true ? (){} : () async {
+        print(provider.didsOfMultiDateSelected);
+        if(provider.didsOfMultiDateSelected.isNotEmpty){
+         await provider.unAttendMultiDate(context, provider.didsOfMultiDateSelected);
+        }
+        if(provider.didAttendedDate.isNotEmpty){
+          await provider.attendMultiDate(context, provider.didAttendedDate);
+        }
+      },
+      child: Card(
+        color: provider.answerMultiDate == true ? ColorConstants.colorNewGray : ColorConstants.primaryColor,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(DimensionConstants.d8.r)),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: DimensionConstants.d10.h, horizontal: DimensionConstants.d5.w),
+          alignment: Alignment.center,
+          child: Text(provider.answerMultiDate ? "submitted".tr() : "submit".tr())
+              .semiBoldText(provider.answerMultiDate == true ? ColorConstants.colorGray : ColorConstants.colorWhite,
+              DimensionConstants.d12.sp, TextAlign.left,
+              maxLines: 1, overflow: TextOverflow.ellipsis),
+        ),
+      ),
+    );
   }
 
   alertForQuestionnaireAnswers(BuildContext context,
@@ -406,7 +564,7 @@ class EventDetailScreen extends StatelessWidget {
                       GestureDetector(
                           onTap: () {
                             if (_formKey.currentState!.validate()) {
-                              final Map<String, dynamic> answersMap = {};
+                            //  final Map<String, dynamic> answersMap = {};
                               // for(int i = 0; i < provider.questionnaireKeysList.length; i++){
                               //   if(i == 0){
                               //     answersMap.addAll({

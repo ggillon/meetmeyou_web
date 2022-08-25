@@ -9,6 +9,7 @@ class GetEventResponse {
   String? description;
   String? organiserID;
   String? title;
+  bool? multipleDates;
   dynamic start;
   dynamic end;
 
@@ -39,6 +40,7 @@ class GetEventResponse {
     description = json['description'];
     organiserID = json['organiserID'];
     title = json['title'];
+    multipleDates = json['multipleDates'];
     start = json['start'];
     end = json['end'];
     invitedContacts = json['invitedContacts'] != null ? InvitedContacts(json['invitedContacts']) : null;

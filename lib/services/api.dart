@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:meetmeyou_web/api_models/attend_unattend_event_response.dart';
+import 'package:meetmeyou_web/api_models/attend_unattend_multi_date_response.dart';
+import 'package:meetmeyou_web/api_models/get_multi_dates_response.dart';
 import 'package:meetmeyou_web/api_models/get_set_profile_response.dart';
 import 'package:meetmeyou_web/api_models/set_questionaire_response.dart';
 import 'package:meetmeyou_web/constants/api_constants.dart';
@@ -93,6 +95,74 @@ class Api {
       var response = await dio.get(ApiConstants.baseUrl + ApiConstants.setEventAnswer, queryParameters: map);
 
       return SetQuestionnaireResponse.fromJson(json.decode(response.toString()));
+    } on DioError catch (e) {
+      if (e.response != null) {
+        throw FetchDataException("error".tr());
+      } else {
+        throw const SocketException("");
+      }
+    }
+  }
+
+  Future<SetQuestionnaireResponse> getAnswersQuestionnaireForm(String uid, String eid) async {
+    try {
+
+      var map = {"uid": uid, "eid" : eid};
+
+      var response = await dio.get(ApiConstants.baseUrl + ApiConstants.getEventAnswer, queryParameters: map);
+
+      return SetQuestionnaireResponse.fromJson(json.decode(response.toString()));
+    } on DioError catch (e) {
+      if (e.response != null) {
+        throw FetchDataException("error".tr());
+      } else {
+        throw const SocketException("");
+      }
+    }
+  }
+
+  Future<GetMultiDatesResponse> getMultiDates(String eid) async {
+    try {
+
+      var map = {"eid" : eid};
+
+      var response = await dio.get(ApiConstants.baseUrl + ApiConstants.getMultiDates, queryParameters: map);
+
+      return GetMultiDatesResponse.fromJson(response.data);
+    } on DioError catch (e) {
+      if (e.response != null) {
+        throw FetchDataException("error".tr());
+      } else {
+        throw const SocketException("");
+      }
+    }
+  }
+
+  Future<AttendUnAttendMultiDateResponse> attendMultiDate(String uid, String eid, List<String> dids) async {
+    try {
+
+      var map = {"uid" : uid, "eid" : eid, 'did[]': dids};
+
+      var response = await dio.get(ApiConstants.baseUrl + ApiConstants.attendMultiDate, queryParameters: map);
+
+      return AttendUnAttendMultiDateResponse.fromJson(response.data);
+    } on DioError catch (e) {
+      if (e.response != null) {
+        throw FetchDataException("error".tr());
+      } else {
+        throw const SocketException("");
+      }
+    }
+  }
+
+  Future<AttendUnAttendMultiDateResponse> unAttendMultiDate(String uid, String eid, List<String> dids) async {
+    try {
+
+      var map = {"uid" : uid, "eid" : eid, 'did[]': dids};
+
+      var response = await dio.get(ApiConstants.baseUrl + ApiConstants.unAttendMultiDate, queryParameters: map);
+
+      return AttendUnAttendMultiDateResponse.fromJson(response.data);
     } on DioError catch (e) {
       if (e.response != null) {
         throw FetchDataException("error".tr());

@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:meetmeyou_web/api_models/get_multi_dates_response.dart';
+import 'package:meetmeyou_web/api_models/set_questionaire_response.dart';
 import 'package:meetmeyou_web/constants/api_constants.dart';
 import 'package:meetmeyou_web/constants/color_constants.dart';
 import 'package:meetmeyou_web/dialog_helper.dart';
@@ -23,7 +25,10 @@ class EventDetailProvider extends BaseProvider {
   InvitedContacts? invitedContacts;
   QuestionForm? questionForm;
   List<String> questionnaireKeysList = [];
+  List<String> questionnaireValuesList = [];
   List<String> questionsList = [];
+  Answers? answers;
+  bool multipleDates = false;
 
   String respondBtnStatus = '';
   Color respondBtnColor = ColorConstants.primaryColor;
@@ -35,6 +40,7 @@ class EventDetailProvider extends BaseProvider {
       var model = await api.getEvent(eid);
       if(model != null){
         eventResponse = model;
+        multipleDates = model.multipleDates ?? false;
         if(model.invitedContacts != null){
           invitedContacts = model.invitedContacts;
           respondBtnStatus =  getEventBtnStatus(invitedContacts!.keysList, invitedContacts!.valuesList);
@@ -42,8 +48,35 @@ class EventDetailProvider extends BaseProvider {
           respondBtnTextColor = getEventBtnColorStatus(invitedContacts!.keysList, invitedContacts!.valuesList);
         }
         if(model.form != null){
+          questionsList = [];
           questionnaireKeysList = model.form!.keysList;
-          questionsList = model.form!.valuesList;
+          questionnaireValuesList = model.form!.valuesList;
+
+          for(int i = 0 ; i < questionnaireKeysList.length ; i++){
+            if(questionnaireKeysList[i] == "1. text"){
+              questionsList.add(questionnaireValuesList[i]);
+            }
+          }
+          for(int i = 0 ; i < questionnaireKeysList.length ; i++){
+            if(questionnaireKeysList[i] == "2. text"){
+              questionsList.add(questionnaireValuesList[i]);
+            }
+          }
+          for(int i = 0 ; i < questionnaireKeysList.length ; i++){
+            if(questionnaireKeysList[i] == "3. text"){
+              questionsList.add(questionnaireValuesList[i]);
+            }
+          }
+          for(int i = 0 ; i < questionnaireKeysList.length ; i++){
+            if(questionnaireKeysList[i] == "4. text"){
+              questionsList.add(questionnaireValuesList[i]);
+            }
+          }
+          for(int i = 0 ; i < questionnaireKeysList.length ; i++){
+            if(questionnaireKeysList[i] == "5. text"){
+              questionsList.add(questionnaireValuesList[i]);
+            }
+          }
         }
       }
       setState(ViewState.Idle);
@@ -125,6 +158,113 @@ class EventDetailProvider extends BaseProvider {
       return false;
     } on SocketException catch (c) {
       setState(ViewState.Idle);
+      DialogHelper.showMessage(context, 'internet_connection'.tr());
+      return false;
+    }
+  }
+
+
+  Future<bool> getAnswersQuestionnaireForm(BuildContext context) async{
+    setState(ViewState.Busy);
+    try{
+    var value =  await api.getAnswersQuestionnaireForm(userUid.toString(), eventId.toString());
+    if(value != null){
+      answers = value.answers;
+    }
+      setState(ViewState.Idle);
+      return true;
+    } on FetchDataException catch (c) {
+      setState(ViewState.Idle);
+      DialogHelper.showMessage(context, "error".tr());
+      return false;
+    } on SocketException catch (c) {
+      setState(ViewState.Idle);
+      DialogHelper.showMessage(context, 'internet_connection'.tr());
+      return false;
+    }
+  }
+
+  /// multi dates
+
+  List<GetMultiDates> multiDates = [];
+  List<String> allDateDidList = [];
+  List<String> didAttendedDate = [];
+
+  Future<bool> getMultiDates(BuildContext context, {bool multiAns = false}) async{
+    multiAns ? updateAnswerMultiDate(true) : setState(ViewState.Busy);
+    try{
+      var value =  await api.getMultiDates(eventId.toString());
+      if(value != null){
+        multiDates = value.multiDates;
+        multiDates.sort((a,b) {
+          return a.start!.compareTo(b.start!);
+        });
+        for(var element in multiDates){
+          allDateDidList.add(element.did.toString());
+        }
+
+        for(var element in multiDates){
+          var currentDateStatus = getEventBtnStatus(element.invitedContacts!.keysList, element.invitedContacts!.valuesList);
+          if(currentDateStatus == "going"){
+            didAttendedDate.add(element.did.toString());
+          }
+        }
+      }
+      multiAns ? updateAnswerMultiDate(false) :  setState(ViewState.Idle);
+      return true;
+    } on FetchDataException catch (c) {
+      multiAns ? updateAnswerMultiDate(false) :  setState(ViewState.Idle);
+      DialogHelper.showMessage(context, "error".tr());
+      return false;
+    } on SocketException catch (c) {
+      multiAns ? updateAnswerMultiDate(false) :  setState(ViewState.Idle);
+      DialogHelper.showMessage(context, 'internet_connection'.tr());
+      return false;
+    }
+  }
+
+  bool answerMultiDate = false;
+
+   updateAnswerMultiDate(bool val){
+    answerMultiDate = val;
+    notifyListeners();
+  }
+
+  int selectedMultiDateIndex = -1;
+
+  List<String> didsOfMultiDateSelected = [];
+
+  Future<bool> attendMultiDate(BuildContext context, List<String> dids) async{
+    updateAnswerMultiDate(true);
+    try{
+      await api.attendMultiDate(userUid.toString(), eventId.toString(), dids);
+      didsOfMultiDateSelected = [];
+      await getMultiDates(context, multiAns: true);
+     // updateAnswerMultiDate(false);
+      return true;
+    } on FetchDataException catch (c) {
+      updateAnswerMultiDate(false);
+      DialogHelper.showMessage(context, "error".tr());
+      return false;
+    } on SocketException catch (c) {
+      updateAnswerMultiDate(false);
+      DialogHelper.showMessage(context, 'internet_connection'.tr());
+      return false;
+    }
+  }
+
+  Future<bool> unAttendMultiDate(BuildContext context, List<String> dids) async{
+    updateAnswerMultiDate(true);
+    try{
+      await api.unAttendMultiDate(userUid.toString(), eventId.toString(), dids);
+      await getMultiDates(context, multiAns: true);
+      return true;
+    } on FetchDataException catch (c) {
+      updateAnswerMultiDate(false);
+      DialogHelper.showMessage(context, "error".tr());
+      return false;
+    } on SocketException catch (c) {
+      updateAnswerMultiDate(false);
       DialogHelper.showMessage(context, 'internet_connection'.tr());
       return false;
     }
