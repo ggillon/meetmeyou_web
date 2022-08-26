@@ -8,6 +8,7 @@ import 'package:meetmeyou_web/dialog_helper.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
+import 'package:meetmeyou_web/main.dart';
 import 'package:meetmeyou_web/models/event.dart';
 import 'package:meetmeyou_web/api_models/get_event_response.dart';
 import 'package:meetmeyou_web/models/user_detail.dart';
@@ -33,6 +34,8 @@ class EventDetailProvider extends BaseProvider {
   String respondBtnStatus = '';
   Color respondBtnColor = ColorConstants.primaryColor;
   Color respondBtnTextColor = ColorConstants.colorWhite;
+
+  LoginInfo loginInfo = LoginInfo();
 
   Future<bool> getEvent(BuildContext context, String eid) async{
     setState(ViewState.Busy);

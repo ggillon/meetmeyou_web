@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meetmeyou_web/constants/color_constants.dart';
 import 'package:meetmeyou_web/constants/dimension_constants.dart';
+import 'package:meetmeyou_web/constants/image_constants.dart';
 import 'package:meetmeyou_web/constants/route_constants.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/extensions/all_extensions.dart';
@@ -14,9 +15,11 @@ import 'package:meetmeyou_web/helper/decoration.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/helper/validations.dart';
 import 'package:meetmeyou_web/locator.dart';
+import 'package:meetmeyou_web/main.dart';
 import 'package:meetmeyou_web/provider/edit_profile_provider.dart';
 import 'package:meetmeyou_web/view/base_view.dart';
 import 'package:meetmeyou_web/widgets/image_view.dart';
+import 'package:provider/provider.dart';
 
 class EditProfileScreen extends StatelessWidget {
   EditProfileScreen({Key? key}) : super(key: key);
@@ -42,7 +45,7 @@ class EditProfileScreen extends StatelessWidget {
           phoneController.text = SharedPreference.prefs!.getString(SharedPreference.phone) ?? "";
           emailController.text = SharedPreference.prefs!.getString(SharedPreference.email) ?? "";
           addressController.text = SharedPreference.prefs!.getString(SharedPreference.address) ?? "";
-
+          provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
         },
         builder: (context, provider, _){
           return Form(
@@ -51,7 +54,7 @@ class EditProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CommonWidgets.commonAppBar(context, true, routeName: RouteConstants.viewProfileScreen, userName: SharedPreference.prefs!.getString(SharedPreference.displayName) ?? "",),
+                  commonAppBar(context, true, routeName: RouteConstants.viewProfileScreen, userName: SharedPreference.prefs!.getString(SharedPreference.displayName) ?? "",),
                   SizedBox(height: DimensionConstants.d20.h),
                   Padding(
                     padding: MediaQuery.of(context).size.width > 1050 ? EdgeInsets.symmetric(horizontal: DimensionConstants.d50.w) :  EdgeInsets.symmetric(horizontal: DimensionConstants.d20.w),
@@ -60,6 +63,7 @@ class EditProfileScreen extends StatelessWidget {
                       children: [
                         GestureDetector(
                           onTap: (){
+                            provider.loginInfo.setLoginState(true);
                             context.go(RouteConstants.eventDetailScreen);
                           },
                           child: Align(
@@ -117,6 +121,77 @@ class EditProfileScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget commonAppBar(BuildContext context, bool navigate, {String? routeName, String? userName}){
+    return Card(
+        margin: EdgeInsets.zero,
+        child: Container(
+            padding: EdgeInsets.symmetric(vertical: DimensionConstants.d18.h, horizontal: DimensionConstants.d10.w),
+            width: double.infinity,
+            height: DimensionConstants.d75.h,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(width: DimensionConstants.d80.w,
+                    alignment: Alignment.centerLeft,
+                    child: ImageView(path: ImageConstants.webLogo, width: DimensionConstants.d80.w,)),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    child:  Text(userName == null ? "Welcome" : "Welcome $userName")
+                        .semiBoldText(ColorConstants.colorBlack,
+                        DimensionConstants.d16.sp, TextAlign.left),
+                  ),
+                ),
+                Container(
+                  width: DimensionConstants.d80.w,
+                  alignment: Alignment.centerRight,
+                  child: PopupMenuButton<int>(
+                    itemBuilder: (context) => [
+                      // PopupMenuItem 1
+                      PopupMenuItem(
+                        value: 1,
+                        child: Text("view_edit_profile".tr())
+                            .mediumText(ColorConstants.primaryColor,
+                            DimensionConstants.d14.sp, TextAlign.left),
+                      ),
+                      // PopupMenuItem 2
+                      PopupMenuItem(
+                        value: 2,
+                        child:  Text("logout".tr())
+                            .mediumText(ColorConstants.colorBlack,
+                            DimensionConstants.d14.sp, TextAlign.left),
+                      ),
+                    ],
+                    offset: Offset(0, 50),
+                    color: Colors.white,
+                    elevation: 2,
+                    icon: Icon(Icons.menu, color: ColorConstants.primaryColor, size: 30),
+                    onSelected: (value) {
+                      if (value == 1) {
+                        if(navigate){
+                          provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+                          provider.loginInfo.setLoginState(false);
+                          context.go(routeName!);
+                          provider.updateLoadingStatus(true);
+                        }
+                      } else if (value == 2) {
+                        //    provider.isDisposed = false;
+                        provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+                        provider.loginInfo.setLoginState(false);
+                        provider.loginInfo.setLogoutState(true);
+                        provider.updateLoadingStatus(true);
+                        context.go("/");
+                        provider.updateLoadingStatus(true);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ))
     );
   }
 
@@ -324,6 +399,7 @@ class EditProfileScreen extends StatelessWidget {
     return GestureDetector(
         onTap: (){
           if(_formKey.currentState!.validate()){
+            provider.loginInfo.setLoginState(false);
             provider.setUserProfile(context, firstNameController.text, lastNameController.text, provider.userDetail.profileUrl.toString(), emailController.text,
                 phoneController.text, addressController.text, provider.countryCode == null ?  (SharedPreference.prefs!.getString(SharedPreference.countryCode) ?? "") : provider.countryCode.toString()).then((value){
                   if(value == true){

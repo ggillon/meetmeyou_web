@@ -7,6 +7,7 @@ import 'package:meetmeyou_web/dialog_helper.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
+import 'package:meetmeyou_web/main.dart';
 import 'package:meetmeyou_web/models/user_detail.dart';
 import 'package:meetmeyou_web/provider/base_provider.dart';
 import 'package:meetmeyou_web/services/fetch_data_exception.dart';
@@ -16,6 +17,7 @@ class EditProfileProvider extends BaseProvider{
   final userUid = SharedPreference.prefs!.getString(SharedPreference.userId);
   MMYEngine? mmyEngine;
   String? countryCode;
+  LoginInfo loginInfo = LoginInfo();
 
   GetSetProfileResponse? profileResponse;
 

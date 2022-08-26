@@ -13,11 +13,14 @@ import 'package:meetmeyou_web/helper/date_time_helper.dart';
 import 'package:meetmeyou_web/helper/decoration.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
+import 'package:meetmeyou_web/main.dart';
 import 'package:meetmeyou_web/models/event.dart';
 import 'package:meetmeyou_web/provider/event_detail_provider.dart';
 import 'package:meetmeyou_web/view/base_view.dart';
 import 'package:meetmeyou_web/widgets/custom_dialog.dart';
 import 'package:meetmeyou_web/widgets/image_view.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class EventDetailScreen extends StatelessWidget {
   EventDetailScreen({Key? key}) : super(key: key);
@@ -32,6 +35,8 @@ class EventDetailScreen extends StatelessWidget {
   final answer5Controller = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
+
+  LoginInfo loginInfo1 = LoginInfo();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +44,10 @@ class EventDetailScreen extends StatelessWidget {
         body: BaseView<EventDetailProvider>(
       onModelReady: (provider) async {
         this.provider = provider;
+      //  provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
         await provider.getEvent(context, provider.eventId.toString());
+
+        provider.loginInfo.setLoginState(true);
 
         // for questionnaire answers
        if(provider.respondBtnStatus == "going" && provider.questionnaireKeysList.isNotEmpty){
@@ -77,7 +85,7 @@ class EventDetailScreen extends StatelessWidget {
               child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      CommonWidgets.commonAppBar(context, true,
+                      commonAppBar(context, true,
                           routeName: RouteConstants.viewProfileScreen,
                           userName: SharedPreference.prefs!.getString(SharedPreference.displayName)),
                       Padding(
@@ -93,10 +101,10 @@ class EventDetailScreen extends StatelessWidget {
                               clipBehavior: Clip.none,
                               alignment: Alignment.bottomCenter,
                               children: [
-                                imageView(context, provider.eventResponse?.photoURL ?? ""),
+                                CommonWidgets.imageView(context, provider.eventResponse?.photoURL ?? ""),
                                 Positioned(
                                   bottom: -DimensionConstants.d75,
-                                  child: titleDateLocationCard(context, provider.eventResponse?.title ?? "",  DateTime.fromMillisecondsSinceEpoch(provider.eventResponse?.start ?? "")
+                                  child: CommonWidgets.titleDateLocationCard(context, provider.eventResponse?.title ?? "",  DateTime.fromMillisecondsSinceEpoch(provider.eventResponse?.start ?? "")
                                       , DateTime.fromMillisecondsSinceEpoch(provider.eventResponse?.end ?? ""), provider.eventResponse?.location ?? "",
                                       provider.eventResponse?.organiserName ?? ""),
                                 )
@@ -139,37 +147,7 @@ class EventDetailScreen extends StatelessWidget {
                                       TextAlign.left),
                             ),
                             SizedBox(height: DimensionConstants.d10.h),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                MediaQuery.of(context).size.width > 900
-                                    ? ImageView(
-                                        path: ImageConstants.appStore,
-                                        height: DimensionConstants.d40.h,
-                                        width: DimensionConstants.d40.w,
-                                        fit: BoxFit.contain,
-                                      )
-                                    : ImageView(
-                                        path: ImageConstants.appStore,
-                                        height: DimensionConstants.d60.h,
-                                        width: DimensionConstants.d75.w,
-                                        fit: BoxFit.contain,
-                                      ),
-                                SizedBox(width: DimensionConstants.d5.w),
-                                MediaQuery.of(context).size.width > 900
-                                    ? ImageView(
-                                        path: ImageConstants.googleStore,
-                                        height: DimensionConstants.d40.h,
-                                        width: DimensionConstants.d40.w,
-                                        fit: BoxFit.contain,
-                                      )
-                                    : ImageView(
-                                        path: ImageConstants.googleStore,
-                                        height: DimensionConstants.d60.h,
-                                        width: DimensionConstants.d75.w,
-                                        fit: BoxFit.contain)
-                              ],
-                            ),
+                            CommonWidgets.appPlayStoreBtn(context),
                             SizedBox(height: DimensionConstants.d10.h),
                           ],
                         ),
@@ -182,156 +160,74 @@ class EventDetailScreen extends StatelessWidget {
     ));
   }
 
-  Widget imageView(BuildContext context, String photoUrl) {
+  Widget commonAppBar(BuildContext context, bool navigate, {String? routeName, String? userName}){
     return Card(
-      margin: EdgeInsets.zero,
-      shadowColor: ColorConstants.colorWhite,
-      elevation: 5.0,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(DimensionConstants.d12.r),
-              bottomRight: Radius.circular(DimensionConstants.d12.r))),
-      color: ColorConstants.colorLightGray,
-      child: SizedBox(
-        height: MediaQuery.of(context).size.width > 1050
-            ? DimensionConstants.d325.h
-            : DimensionConstants.d300.h,
-        width: double.infinity,
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(DimensionConstants.d12.r),
-              bottomRight: Radius.circular(DimensionConstants.d12.r)),
-          child: photoUrl == ""
-              ? ImageView(
-                  path: DEFAULT_EVENT_PHOTO_URL,
-                  fit: BoxFit.cover,
-                  height: DimensionConstants.d50.h,
-                  width: double.infinity,
-                )
-              : ImageView(
-                  path: photoUrl,
-                  fit: BoxFit.cover,
-                  height: DimensionConstants.d50.h,
-                  width: double.infinity,
-                ),
-        ),
-      ),
-    );
-  }
-
-  Widget titleDateLocationCard(BuildContext context, String eventTitle, DateTime startDate, DateTime endDate, String location, String organiserName) {
-    return Container(
-      // width: DimensionConstants.d200.w,
-      padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d5.w),
-      child: Card(
-          shadowColor: ColorConstants.colorWhite,
-          elevation: 5.0,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(DimensionConstants.d12.r)),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d5.w, vertical: DimensionConstants.d10.h),
+        margin: EdgeInsets.zero,
+        child: Container(
+            padding: EdgeInsets.symmetric(vertical: DimensionConstants.d18.h, horizontal: DimensionConstants.d10.w),
+            width: double.infinity,
+            height: DimensionConstants.d75.h,
+            alignment: Alignment.centerLeft,
             child: Row(
-              //  mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                dateCard(startDate),
-                SizedBox(width: DimensionConstants.d5.w),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width > 1050 ? DimensionConstants.d175.w :  DimensionConstants.d225.w,
-                      child: Text(eventTitle)
-                          .boldText(ColorConstants.colorBlack,
-                          DimensionConstants.d15.sp, TextAlign.left,
-                          maxLines: 1, overflow: TextOverflow.ellipsis),
-                    ),
-                    SizedBox(height: DimensionConstants.d6.h),
-                    Row(
-                      children: [
-                        const ImageView(path: ImageConstants.event_clock_icon),
-                        SizedBox(width: DimensionConstants.d5.w),
-                        SizedBox(
-                          width:  MediaQuery.of(context).size.width > 1050 ? DimensionConstants.d150.w : DimensionConstants.d200.w,
-                          child: Text(
-                              (startDate.toString().substring(0, 11)) ==
-                                  (endDate
-                                      .toString()
-                                      .substring(0, 11))
-                                  ? DateTimeHelper.getWeekDay(startDate) +
-                                  " - " +
-                                  DateTimeHelper.convertEventDateToTimeFormat(
-                                      startDate) +
-                                  " to " +
-                                  DateTimeHelper.convertEventDateToTimeFormat(
-                                      endDate)
-                                  : DateTimeHelper.getWeekDay(startDate) +
-                                  " - " +
-                                  DateTimeHelper.convertEventDateToTimeFormat(startDate) +
-                                  " to " +
-                                  DateTimeHelper.dateConversion(endDate) +
-                                  " ( ${DateTimeHelper.convertEventDateToTimeFormat(endDate)})")
-                              .regularText(ColorConstants.colorGray, DimensionConstants.d12.sp, TextAlign.left, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: DimensionConstants.d6.h),
-                    Row(
-                      children: [
-                        const ImageView(path: ImageConstants.map),
-                        SizedBox(width: DimensionConstants.d5.w),
-                        SizedBox(
-                          width:  MediaQuery.of(context).size.width > 1050 ? DimensionConstants.d150.w : DimensionConstants.d200.w,
-                          child: Text(location)
-                              .regularText(ColorConstants.colorGray,
-                              DimensionConstants.d12.sp, TextAlign.left,
-                              maxLines: 2, overflow: TextOverflow.ellipsis),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: DimensionConstants.d5.h),
-                    Row(
-                      children: [
-                        const Icon(Icons.person),
-                        SizedBox(width: DimensionConstants.d3.w),
-                        Container(
-                          width:  MediaQuery.of(context).size.width > 1050 ? DimensionConstants.d150.w : DimensionConstants.d200.w,
-                          child: Text("$organiserName (${"organiser".tr()})")
-                              .regularText(ColorConstants.colorGray,
-                              DimensionConstants.d12.sp, TextAlign.left,
-                              maxLines: 1, overflow: TextOverflow.ellipsis),
-                        ),
-                      ],
-                    )
-                  ],
+                Container(width: DimensionConstants.d80.w,
+                    alignment: Alignment.centerLeft,
+                    child: ImageView(path: ImageConstants.webLogo, width: DimensionConstants.d80.w,)),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    child:  Text(userName == null ? "Welcome" : "Welcome $userName")
+                        .semiBoldText(ColorConstants.colorBlack,
+                        DimensionConstants.d16.sp, TextAlign.left),
+                  ),
+                ),
+                Container(
+                  width: DimensionConstants.d80.w,
+                  alignment: Alignment.centerRight,
+                  child: PopupMenuButton<int>(
+                    itemBuilder: (context) => [
+                      // PopupMenuItem 1
+                      PopupMenuItem(
+                        value: 1,
+                        child: Text("view_edit_profile".tr())
+                            .mediumText(ColorConstants.primaryColor,
+                            DimensionConstants.d14.sp, TextAlign.left),
+                      ),
+                      // PopupMenuItem 2
+                      PopupMenuItem(
+                        value: 2,
+                        child:  Text("logout".tr())
+                            .mediumText(ColorConstants.colorBlack,
+                            DimensionConstants.d14.sp, TextAlign.left),
+                      ),
+                    ],
+                    offset: Offset(0, 50),
+                    color: Colors.white,
+                    elevation: 2,
+                    icon: Icon(Icons.menu, color: ColorConstants.primaryColor, size: 30),
+                    onSelected: (value) {
+                      if (value == 1) {
+                        if(navigate){
+                          provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+                          provider.loginInfo.setLoginState(false);
+                          context.go(routeName!);
+                          provider.updateLoadingStatus(true);
+                        }
+                      } else if (value == 2) {
+                    //    provider.isDisposed = false;
+                        provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+                        provider.loginInfo.setLoginState(false);
+                        provider.loginInfo.setLogoutState(true);
+                        provider.updateLoadingStatus(true);
+                        context.go("/");
+                        provider.updateLoadingStatus(true);
+                      }
+                    },
+                  ),
                 ),
               ],
-            ),
-          )),
-    );
-  }
-
-  Widget dateCard(DateTime startDate) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(DimensionConstants.d12.r)),
-      child: Container(
-        decoration: BoxDecoration(
-            color: ColorConstants.primaryColor.withOpacity(0.2),
-            borderRadius:BorderRadius.circular(DimensionConstants.d12.r) // use instead of BorderRadius.all(Radius.circular(20))
-        ),
-        padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d10.w, vertical: DimensionConstants.d10.h),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(DateTimeHelper.getMonthByName(startDate))
-                .regularText(ColorConstants.primaryColor,
-                DimensionConstants.d15.sp, TextAlign.center),
-            Text(startDate.day <= 9 ? "0${startDate.day.toString()}" : startDate.day.toString())
-                .boldText(ColorConstants.primaryColor, DimensionConstants.d14.sp,
-                TextAlign.center)
-          ],
-        ),
-      ),
+            ))
     );
   }
 

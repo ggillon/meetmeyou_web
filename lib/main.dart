@@ -10,12 +10,15 @@ import 'package:meetmeyou_web/constants/route_constants.dart';
 import 'package:meetmeyou_web/constants/string_constants.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
+import 'package:meetmeyou_web/provider/base_provider.dart';
+import 'package:meetmeyou_web/provider/login_invited_provider.dart';
 import 'package:meetmeyou_web/services/auth/auth.dart';
 import 'package:meetmeyou_web/view/edit_profile_screen.dart';
 import 'package:meetmeyou_web/view/event_detail_screen.dart';
 import 'package:meetmeyou_web/view/login_invited_screen.dart';
 import 'package:meetmeyou_web/view/view_profile_screen.dart';
 import 'package:meetmeyou_web/widgets/error_screen.dart';
+import 'package:meetmeyou_web/widgets/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -61,57 +64,29 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    //Set the fit size (Find your UI design, look at the dimensions of the device screen and fill it in,unit in dp)
-    return ScreenUtilInit(
-       designSize:  const Size(DimensionConstants.d360, DimensionConstants.d690),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          title: StringConstants.appName,
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.locale,
-          theme: ThemeData(
-            primarySwatch: color,
-          ),
-          routeInformationProvider: _router.routeInformationProvider,
-          routeInformationParser: _router.routeInformationParser,
-          routerDelegate: _router.routerDelegate,
-        );
-      },
-    );
-  }
+  final LoginInfo _loginInfo = LoginInfo();
 
-  MaterialColor color = const MaterialColor(0xFF00B9A7, <int, Color>{
-    50: Color(0xFF00B9A7),
-    100: Color(0xFF00B9A7),
-    200: Color(0xFF00B9A7),
-    300: Color(0xFF00B9A7),
-    400: Color(0xFF00B9A7),
-    500: Color(0xFF00B9A7),
-    600: Color(0xFF00B9A7),
-    700: Color(0xFF00B9A7),
-    800: Color(0xFF00B9A7),
-    900: Color(0xFF00B9A7),
-  });
-
-  final GoRouter _router = GoRouter(
+  late final GoRouter _router = GoRouter(
     // turn off the # in the URLs on the web
     urlPathStrategy: UrlPathStrategy.path,
-
     routes: <GoRoute>[
+      // GoRoute(
+      //   path: "/",
+      //   // name: "login",
+      //   builder: (BuildContext context, GoRouterState state) {
+      //     return SplashPage();
+      //   },
+      // ),
       GoRoute(
         path: "/",
+        // name: "login",
         builder: (BuildContext context, GoRouterState state) {
           return LoginInvitedScreen();
         },
       ),
       GoRoute(
         path: RouteConstants.eventDetailScreen,
+      //    name: "eventDetailLocation",
         builder: (BuildContext context, GoRouterState state) {
           return EventDetailScreen();
         },
@@ -129,6 +104,102 @@ class MyApp extends StatelessWidget {
         },
       ),
     ],
-    errorBuilder: (context, state) => ErrorScreen(state.error!),
+      errorBuilder: (context, state) => ErrorScreen(state.error!),
+    redirect: (GoRouterState state){
+      // final loginLocation = state.namedLocation("login");
+     //  final eventDetailLocation = state.namedLocation("eventDetailLocation");
+
+       final isLoggedIn = _loginInfo.loginState;
+
+
+       final isGoingToEventDetail = state.subloc == RouteConstants.eventDetailScreen;
+
+       if(isLoggedIn){
+         return isGoingToEventDetail ? null : RouteConstants.eventDetailScreen;
+       }
+
+       final isLoggedOut = _loginInfo.logoutState;
+       final isOnEventDetail = state.location == RouteConstants.eventDetailScreen;
+
+         if(isLoggedOut) {
+         //  _loginInfo.setLoginState(false);
+           return isOnEventDetail ? "/" : null;
+         }
+
+
+
+      // no need to redirect at all
+      return null;
+
+
+    },
+    // changes on the listenable will cause the router to refresh it's route
+    refreshListenable: _loginInfo,
   );
+  @override
+  Widget build(BuildContext context) {
+    //Set the fit size (Find your UI design, look at the dimensions of the device screen and fill it in,unit in dp)
+    return  ChangeNotifierProvider<LoginInfo>.value(
+      value: _loginInfo,
+      child:  ScreenUtilInit(
+          designSize:  const Size(DimensionConstants.d360, DimensionConstants.d690),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (context, child) =>
+         MaterialApp.router(
+                routeInformationProvider: _router.routeInformationProvider,
+                routeInformationParser: _router.routeInformationParser,
+                routerDelegate: _router.routerDelegate,
+                debugShowCheckedModeBanner: false,
+                title: StringConstants.appName,
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,
+                theme: ThemeData(
+                  primarySwatch: color,
+                ),
+              )
+
+      ),
+    );
+  }
+
+  MaterialColor color = const MaterialColor(0xFF00B9A7, <int, Color>{
+    50: Color(0xFF00B9A7),
+    100: Color(0xFF00B9A7),
+    200: Color(0xFF00B9A7),
+    300: Color(0xFF00B9A7),
+    400: Color(0xFF00B9A7),
+    500: Color(0xFF00B9A7),
+    600: Color(0xFF00B9A7),
+    700: Color(0xFF00B9A7),
+    800: Color(0xFF00B9A7),
+    900: Color(0xFF00B9A7),
+  });
+}
+
+/// The login information.
+class LoginInfo extends ChangeNotifier {
+  bool loginState = false;
+  bool logoutState = false;
+
+   setLoginState(bool state) {
+    SharedPreference.prefs!.setBool(SharedPreference.isLogin, state);
+    loginState = state;
+   // print(loginState);
+    notifyListeners();
+  }
+
+  Future<void> onAppStart() async {
+    loginState = SharedPreference.prefs!.getBool(SharedPreference.isLogin) ?? false;
+   // print(loginState);
+    notifyListeners();
+  }
+
+
+  setLogoutState(bool state) {
+    SharedPreference.prefs!.setBool(SharedPreference.isLogout, state);
+    logoutState = state;
+    notifyListeners();
+  }
 }

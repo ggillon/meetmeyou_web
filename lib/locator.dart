@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
+import 'package:meetmeyou_web/main.dart';
 import 'package:meetmeyou_web/models/user_detail.dart';
 import 'package:meetmeyou_web/provider/edit_profile_provider.dart';
 import 'package:meetmeyou_web/provider/event_detail_provider.dart';
@@ -15,6 +16,7 @@ GetIt locator = GetIt.instance;
 void setupLocator(){
   locator.registerLazySingleton<AuthBase>(() => Auth());
   locator.registerLazySingleton<UserDetail>(() => UserDetail());
+//  locator.registerLazySingleton<LoginInfo>(() => LoginInfo());
   locator.registerFactoryParam<MMYEngine,User,void>((param1, param2) => MMY(param1));
   locator.registerFactory<LoginInvitedProvider>(() => LoginInvitedProvider());
   locator.registerFactory<Api>(() => Api());
@@ -27,4 +29,6 @@ void setupLocator(){
     dio.interceptors.add(LogInterceptor(requestBody: true, responseBody: true));
     return dio;
   });
+
+ // locator.registerSingleton(LoginInfo());
 }
