@@ -33,18 +33,22 @@ Future<bool> getEvent(BuildContext context, String eid) async{
   setState(ViewState.Busy);
   try{
     var model = await api.getEvent(eid);
-    if(model != null){
+    if(model.eid != null){
       eventResponse = model;
       SharedPreference.prefs!.setString(SharedPreference.eventId, model.eid.toString());
+    } else{
+      eventResponse = null;
     }
     setState(ViewState.Idle);
     return true;
   } on FetchDataException catch (c) {
     setState(ViewState.Idle);
+    eventResponse = null;
     DialogHelper.showMessage(context, "error".tr());
     return false;
   } on SocketException catch (c) {
     setState(ViewState.Idle);
+    eventResponse = null;
     DialogHelper.showMessage(context, 'internet_connection'.tr());
     return false;
   }
@@ -109,12 +113,17 @@ Future<void> signInWithFb(BuildContext context) async {
       userDetail.profileUrl = userProfile.photoURL;
       updateData(false);
       SharedPreference.prefs!.setString(SharedPreference.userId, userProfile.uid.toString());
-     // context.go(RouteConstants.eventDetailScreen);
+      loginInfo = Provider.of<LoginInfo>(context, listen: false);
+      loginInfo.setLoginState(true);
+      loginInfo.setLogoutState(false);
+      context.go(RouteConstants.eventDetailScreen);
     } else {
       updateData(false);
       userDetail.displayName = user.displayName;
       SharedPreference.prefs!.setString(SharedPreference.userId, user.uid.toString());
-    //  context.go(RouteConstants.eventDetailScreen);
+      loginInfo = Provider.of<LoginInfo>(context, listen: false);
+      loginInfo.setLoginState(true);
+      loginInfo.setLogoutState(false);
     }
   }
 }
@@ -136,11 +145,15 @@ Future<void> signInWithApple(BuildContext context) async {
       print(userProfile);
       updateData(false);
       SharedPreference.prefs!.setString(SharedPreference.userId, userProfile.uid.toString());
-    //  context.go(RouteConstants.eventDetailScreen);
+      loginInfo = Provider.of<LoginInfo>(context, listen: false);
+      loginInfo.setLoginState(true);
+      loginInfo.setLogoutState(false);
     } else {
       updateData(false);
       SharedPreference.prefs!.setString(SharedPreference.userId, user.uid.toString());
-    //  context.go(RouteConstants.eventDetailScreen);
+      loginInfo = Provider.of<LoginInfo>(context, listen: false);
+      loginInfo.setLoginState(true);
+      loginInfo.setLogoutState(false);
     }
   }
 }

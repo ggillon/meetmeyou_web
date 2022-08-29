@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:meetmeyou_web/main.dart';
 import 'package:meetmeyou_web/models/user_detail.dart';
+import 'package:meetmeyou_web/provider/base_provider.dart';
 import 'package:meetmeyou_web/provider/edit_profile_provider.dart';
 import 'package:meetmeyou_web/provider/event_detail_provider.dart';
 import 'package:meetmeyou_web/provider/login_invited_provider.dart';
@@ -23,6 +24,7 @@ void setupLocator(){
   locator.registerFactory<EventDetailProvider>(() => EventDetailProvider());
   locator.registerFactory<ViewProfileProvider>(() => ViewProfileProvider());
   locator.registerFactory<EditProfileProvider>(() => EditProfileProvider());
+  locator.registerFactory<BaseProvider>(() => BaseProvider());
 
   locator.registerLazySingleton<Dio>(() {
     Dio dio =  Dio();

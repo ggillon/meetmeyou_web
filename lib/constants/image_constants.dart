@@ -9,4 +9,5 @@ class ImageConstants {
   static const googleStore = "images/google_store.png";
   static const phone_no_icon = "images/ic_phone_no.svg";
   static const address_icon = "images/ic_adress.svg";
+  static const personIcon = "images/ic_person.svg";
 }

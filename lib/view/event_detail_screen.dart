@@ -22,8 +22,14 @@ import 'package:meetmeyou_web/widgets/image_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class EventDetailScreen extends StatelessWidget {
-  EventDetailScreen({Key? key}) : super(key: key);
+class EventDetailScreen extends StatefulWidget {
+  const EventDetailScreen({Key? key}) : super(key: key);
+
+  @override
+  _EventDetailScreenState createState() => _EventDetailScreenState();
+}
+
+class _EventDetailScreenState extends State<EventDetailScreen> {
 
   OverlayEntry? overlayEntry;
   EventDetailProvider provider = locator<EventDetailProvider>();
@@ -36,7 +42,20 @@ class EventDetailScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
 
-  LoginInfo loginInfo1 = LoginInfo();
+ // LoginInfo loginInfo1 = LoginInfo();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+   // provider.loginInfo.dispose();
+    provider.loginInfo = Provider.of<LoginInfo>(_scaffoldkey.currentContext!, listen: false);
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,11 +63,10 @@ class EventDetailScreen extends StatelessWidget {
         body: BaseView<EventDetailProvider>(
       onModelReady: (provider) async {
         this.provider = provider;
-      //  provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+        provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
         await provider.getEvent(context, provider.eventId.toString());
 
         provider.loginInfo.setLoginState(true);
-
         // for questionnaire answers
        if(provider.respondBtnStatus == "going" && provider.questionnaireKeysList.isNotEmpty){
          await provider.getAnswersQuestionnaireForm(context);
@@ -65,6 +83,7 @@ class EventDetailScreen extends StatelessWidget {
         if(provider.multipleDates){
           await provider.getMultiDates(context);
         }
+
       },
       builder: (context, provider, _) {
         return provider.state == ViewState.Busy

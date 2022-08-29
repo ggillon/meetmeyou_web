@@ -21,20 +21,34 @@ import 'package:meetmeyou_web/widgets/image_view.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-class LoginInvitedScreen extends StatelessWidget {
-  LoginInvitedScreen({Key? key}) : super(key: key);
+class LoginInvitedScreen extends StatefulWidget {
+  const LoginInvitedScreen({Key? key, required this.eid}) : super(key: key);
+  final String eid;
 
+  @override
+  _LoginInvitedScreenState createState() => _LoginInvitedScreenState();
+}
+
+class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
   LoginInvitedProvider provider = locator<LoginInvitedProvider>();
+
+  @override
+  void dispose() {
+    provider.loginInfo = Provider.of<LoginInfo>(_scaffoldkey.currentContext!, listen: false);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldkey,
       body: BaseView<LoginInvitedProvider>(
         onModelReady: (provider) async {
           this.provider = provider;
            provider.loginInfo =  Provider.of<LoginInfo>(context, listen: false);
-          // provider.loginInfo.onAppStart();
-          await provider.getEvent(context, "mRPe-CIWU");
+           provider.loginInfo.onAppStart();
+          await provider.getEvent(context, widget.eid);
           //   provider.loginInfo.isDisposed = false;
           //  provider.loginInfo.updateLoadingStatus(true);
         },
@@ -54,7 +68,18 @@ class LoginInvitedScreen extends StatelessWidget {
                   ),
                 )
               : SafeArea(
-                  child: SingleChildScrollView(
+                  child: provider.eventResponse == null ?  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(height: DimensionConstants.d5.h),
+                        Text("no_event_found".tr()).regularText(
+                            ColorConstants.primaryColor,
+                            DimensionConstants.d12.sp,
+                            TextAlign.left),
+                      ],
+                    ),
+                  ) :  SingleChildScrollView(
                     child: Column(
                       children: [
                         Card(
@@ -164,18 +189,16 @@ class LoginInvitedScreen extends StatelessWidget {
           socialMediaLoginBtn(
               "sign_up_with_google".tr(), ImageConstants.ic_google, onTap: () {
             SharedPreference.prefs!.setString(SharedPreference.userId, "ZKsRCGO51CWRh4NslebxT3ZsEBY2");
-            //SharedPreference.prefs!.setBool(SharedPreference.isLogin, true);
-            // provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
-            // provider.loginInfo.setLoginState(true);
-            // provider.loginInfo.setLogoutState(false);
-            //  provider.loginInfo.dispose();
-          //  context.go(RouteConstants.eventDetailScreen);
-              provider.data == true
-                  ? const Center(
-                child:
-                CircularProgressIndicator(),
-              )
-                  : provider.signInWithGoogle(context);
+            provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+            provider.loginInfo.setLoginState(true);
+            provider.loginInfo.setLogoutState(false);
+          context.go(RouteConstants.eventDetailScreen);
+              // provider.data == true
+              //     ? const Center(
+              //   child:
+              //   CircularProgressIndicator(),
+              // )
+              //     : provider.signInWithGoogle(context);
           }),
           SizedBox(height: DimensionConstants.d10.h),
           socialMediaLoginBtn(

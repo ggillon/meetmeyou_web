@@ -40,5 +40,9 @@
   "answer_required" : "Answer required",
   "which_days_could_you_attend" : "Which days could you attend ?",
   "submit" : "Submit",
-  "submitted" : "Submitted"
+  "submitted" : "Submitted",
+  "no_event_found" : "NO EVENT FOUND",
+  "home" : "Home",
+  "about" : "About",
+  "data_privacy" : "Data & Privacy"
 }

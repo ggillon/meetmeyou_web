@@ -63,6 +63,7 @@ class EditProfileScreen extends StatelessWidget {
                       children: [
                         GestureDetector(
                           onTap: (){
+                            provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
                             provider.loginInfo.setLoginState(true);
                             context.go(RouteConstants.eventDetailScreen);
                           },

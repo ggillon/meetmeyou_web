@@ -215,9 +215,9 @@ class CommonWidgets{
                    SizedBox(height: DimensionConstants.d5.h),
                    Row(
                      children: [
-                       const Icon(Icons.person),
-                       SizedBox(width: DimensionConstants.d3.w),
-                       Container(
+                       const ImageView(path: ImageConstants.personIcon),
+                       SizedBox(width: DimensionConstants.d5.w),
+                       SizedBox(
                          width:  MediaQuery.of(context).size.width > 1050 ? DimensionConstants.d150.w : DimensionConstants.d200.w,
                          child: Text("$organiserName (${"organiser".tr()})")
                              .regularText(ColorConstants.colorGray,

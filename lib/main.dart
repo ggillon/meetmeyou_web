@@ -15,6 +15,7 @@ import 'package:meetmeyou_web/provider/login_invited_provider.dart';
 import 'package:meetmeyou_web/services/auth/auth.dart';
 import 'package:meetmeyou_web/view/edit_profile_screen.dart';
 import 'package:meetmeyou_web/view/event_detail_screen.dart';
+import 'package:meetmeyou_web/view/home_page.dart';
 import 'package:meetmeyou_web/view/login_invited_screen.dart';
 import 'package:meetmeyou_web/view/view_profile_screen.dart';
 import 'package:meetmeyou_web/widgets/error_screen.dart';
@@ -70,18 +71,18 @@ class MyApp extends StatelessWidget {
     // turn off the # in the URLs on the web
     urlPathStrategy: UrlPathStrategy.path,
     routes: <GoRoute>[
-      // GoRoute(
-      //   path: "/",
-      //   // name: "login",
-      //   builder: (BuildContext context, GoRouterState state) {
-      //     return SplashPage();
-      //   },
-      // ),
       GoRoute(
         path: "/",
         // name: "login",
         builder: (BuildContext context, GoRouterState state) {
-          return LoginInvitedScreen();
+          return SplashPage();
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.loginInvitedScreen,
+        // name: "login",
+        builder: (BuildContext context, GoRouterState state) {
+          return LoginInvitedScreen(eid: state.queryParams['eid'].toString());
         },
       ),
       GoRoute(
@@ -103,9 +104,17 @@ class MyApp extends StatelessWidget {
           return EditProfileScreen();
         },
       ),
+      GoRoute(
+        path: RouteConstants.homePage,
+        builder: (BuildContext context, GoRouterState state) {
+          return HomePage();
+        },
+      ),
     ],
       errorBuilder: (context, state) => ErrorScreen(state.error!),
     redirect: (GoRouterState state){
+      var loc = state.location.toString().split("?eid=");
+      print(loc);
       // final loginLocation = state.namedLocation("login");
      //  final eventDetailLocation = state.namedLocation("eventDetailLocation");
 
@@ -118,12 +127,18 @@ class MyApp extends StatelessWidget {
          return isGoingToEventDetail ? null : RouteConstants.eventDetailScreen;
        }
 
+       // if(isGoingToEventDetail){
+       //  _loginInfo.loginState = true;
+       // }
+
        final isLoggedOut = _loginInfo.logoutState;
        final isOnEventDetail = state.location == RouteConstants.eventDetailScreen;
+       final isOnViewProfile = state.location == RouteConstants.viewProfileScreen;
+       final isOnEditProfile = state.location == RouteConstants.editProfileScreen;
 
          if(isLoggedOut) {
          //  _loginInfo.setLoginState(false);
-           return isOnEventDetail ? "/" : null;
+           return (isOnEventDetail || isOnViewProfile || isOnEditProfile) ? "${RouteConstants.loginInvitedScreen}?eid=${loc[1]}" : null;
          }
 
 
@@ -135,6 +150,7 @@ class MyApp extends StatelessWidget {
     },
     // changes on the listenable will cause the router to refresh it's route
     refreshListenable: _loginInfo,
+
   );
   @override
   Widget build(BuildContext context) {
@@ -192,6 +208,7 @@ class LoginInfo extends ChangeNotifier {
 
   Future<void> onAppStart() async {
     loginState = SharedPreference.prefs!.getBool(SharedPreference.isLogin) ?? false;
+    logoutState = SharedPreference.prefs!.getBool(SharedPreference.isLogout) ?? true;
    // print(loginState);
     notifyListeners();
   }

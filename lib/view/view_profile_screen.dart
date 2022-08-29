@@ -55,6 +55,7 @@ class ViewProfileScreen extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: (){
+                          provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
                           provider.loginInfo.setLoginState(true);
                           context.go(RouteConstants.eventDetailScreen);
                         },
@@ -76,7 +77,7 @@ class ViewProfileScreen extends StatelessWidget {
                       SizedBox(height: DimensionConstants.d15.h),
                       phoneNoAndAddressFun(ImageConstants.phone_no_icon, "Phone_number".tr(), "${provider.userDetail.countryCode} ${provider.userDetail.phone}"),
                       SizedBox(height: DimensionConstants.d10.h),
-                      phoneNoAndAddressFun(ImageConstants.address_icon, "address".tr(), provider.userDetail.address ?? ""),
+                      phoneNoAndAddressFun(ImageConstants.map, "address".tr(), provider.userDetail.address ?? ""),
                     ],
                   ),
                 )

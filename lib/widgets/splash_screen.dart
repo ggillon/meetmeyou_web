@@ -23,7 +23,8 @@ class _SplashPageState extends State<SplashPage> {
   void onStartUp() {
     SharedPreference.prefs!.setBool(SharedPreference.isLogin, false);
     Future.delayed(Duration(milliseconds: 100), (){
-      context.go(RouteConstants.loginInvitedScreen);
+      //context.go("${RouteConstants.loginInvitedScreen}?eid=ePec-pXgm");
+      context.go(RouteConstants.homePage);
     });
   }
 
