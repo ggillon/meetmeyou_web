@@ -296,4 +296,23 @@ class CommonWidgets{
    }
  }
 
+ static Widget footer(){
+   return Container(
+     color: const Color(0XFF333333),
+     height: DimensionConstants.d75,
+     width: double.infinity,
+     alignment: Alignment.center,
+     child: Row(
+       mainAxisAlignment: MainAxisAlignment.center,
+       children: [
+         Icon(Icons.copyright, color: ColorConstants.colorWhite, size: 15,),
+         SizedBox(width: DimensionConstants.d1.w),
+         const Text("MeetMeYou,  2021").regularText(
+             ColorConstants.colorWhite,
+             DimensionConstants.d12.sp,
+             TextAlign.left),
+       ],
+     ),
+   );
+ }
 }

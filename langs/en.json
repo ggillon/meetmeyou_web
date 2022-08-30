@@ -44,5 +44,27 @@
   "no_event_found" : "NO EVENT FOUND",
   "home" : "Home",
   "about" : "About",
-  "data_privacy" : "Data & Privacy"
+  "data_privacy" : "Data & Privacy",
+  "a_simple_application" : "A simple application to create private events",
+  "the_app_allows_text" : "The app allows you to easily create invitations for all your private events or announcements. It is packed with features allowing you to offer multiple date options, collect information and invite people easily through multiple of platforms. Scroll down to learn more or just give our beta web app a try.",
+  "manage_contacts_easily" : "Manage contacts easily",
+  "manage_contacts_desc" : "The app allows you to import contacts from phone, create new ones, and even group them for easy invites",
+  "share_across_platforms" : "Share accross platforms",
+  "share_across_platforms_desc" : "Your invites are automatically shared via mail, but you can also share them with SMS, Whatsapp or Facebook",
+  "offer_multiple_date_choice" : "Offer multiple date choice",
+  "offer_multiple_date_choice_desc" : "Not sure about the date, no problem. The app allows you to offer multiple date choices",
+  "dynamic_forms_to_be_filled" : "Dynamic forms to be filled",
+  "dynamic_forms_to_be_filled_desc" : "Organising a dinner and want to know if people are allergic, add a form to your event invitation",
+  "generates_email_web_invite" : "Generates email & web invite",
+  "generates_email_web_invite_desc" : "Invited people do not need the app to reply, all they need is a valid email",
+  "and_much_much_more" : "And much much more ...",
+  "and_much_much_more_desc" : "There are many cool features available through the app to make things easy and all of this is for free...",
+  "about_us" : "About Us",
+  "about_us_desc" : "MeetMeYou is an application designed and coded from scratch by Gatien Gillon an amateur developer during the Covid winter lockdown. The app and web front-end is coded in flutter, it uses Google Firebase for back-end as well as PHP. If you want to participate to the project please email.",
+  "data_and_privacy_policy" : "Data and Privacy Policy",
+  "data_and_privacy_policy_desc" : "MeetMeYou was design with data privacy in mind. Our back-end limits as much as possible the user and data stored on our servers. We do not monitise the data or use it for any other purposes than the user accessible features in app. Our detail Data and Privacy Policy is available to read",
+  "GDPR_and_data_deletion" : "GDPR and Data Deletion",
+  "data_deletion_desc" : "All data for past events is automatically deleted after 1 month by our robots. Profile data is automatically deleted when you delete your account according to GDRP rules. Should you have any additional concern please send and email to admin@meetmeyou.com with your email or UserID code (available in app on your account page) and we will manually ensure and confirm that all your data is deleted."
+
+
 }

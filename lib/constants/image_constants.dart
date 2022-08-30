@@ -10,4 +10,13 @@ class ImageConstants {
   static const phone_no_icon = "images/ic_phone_no.svg";
   static const address_icon = "images/ic_adress.svg";
   static const personIcon = "images/ic_person.svg";
-}
+  static const phone = "images/phone.png";
+  static const manageContacts = "images/manage_contact.png";
+  static const shareAcrossPlatforms = "images/share_across_platform.png";
+  static const offerMultipleDate = "images/offer_multiple_date.png";
+  static const dynamicForms = "images/dynamic_forms.png";
+  static const generatesEmailAndWeb = "images/generates_email_web.png";
+  static const muchMore = "images/much_more.png";
+  static const dataAndPrivacy = "images/data_and_privacy.jpg";
+  static const dataDeletion = "images/data_deletion.jpg";
+ }
