@@ -185,7 +185,7 @@ class EditProfileScreen extends StatelessWidget {
                         provider.loginInfo.setLoginState(false);
                         provider.loginInfo.setLogoutState(true);
                         provider.updateLoadingStatus(true);
-                        context.go("/");
+                        context.go("${RouteConstants.loginInvitedScreen}?eid=${provider.eventId}");
                         provider.updateLoadingStatus(true);
                       }
                     },

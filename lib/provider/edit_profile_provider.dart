@@ -14,6 +14,7 @@ import 'package:meetmeyou_web/services/fetch_data_exception.dart';
 import 'package:meetmeyou_web/services/mmy/mmy.dart';
 
 class EditProfileProvider extends BaseProvider{
+  final eventId = SharedPreference.prefs!.getString(SharedPreference.eventId);
   final userUid = SharedPreference.prefs!.getString(SharedPreference.userId);
   MMYEngine? mmyEngine;
   String? countryCode;

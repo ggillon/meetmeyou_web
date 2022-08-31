@@ -15,7 +15,8 @@ import 'dart:io';
 
 class ViewProfileProvider extends BaseProvider{
   MMYEngine? mmyEngine;
- final userUid = SharedPreference.prefs!.getString(SharedPreference.userId);
+  final eventId = SharedPreference.prefs!.getString(SharedPreference.eventId);
+  final userUid = SharedPreference.prefs!.getString(SharedPreference.userId);
   LoginInfo loginInfo = LoginInfo();
 
   GetSetProfileResponse? profileResponse;

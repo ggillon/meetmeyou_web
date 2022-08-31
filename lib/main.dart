@@ -75,7 +75,7 @@ class MyApp extends StatelessWidget {
         path: "/",
         // name: "login",
         builder: (BuildContext context, GoRouterState state) {
-          return SplashPage();
+          return HomePage();
         },
       ),
       GoRoute(
@@ -104,12 +104,12 @@ class MyApp extends StatelessWidget {
           return EditProfileScreen();
         },
       ),
-      GoRoute(
-        path: RouteConstants.homePage,
-        builder: (BuildContext context, GoRouterState state) {
-          return HomePage();
-        },
-      ),
+      // GoRoute(
+      //   path: RouteConstants.homePage,
+      //   builder: (BuildContext context, GoRouterState state) {
+      //     return HomePage();
+      //   },
+      // ),
     ],
       errorBuilder: (context, state) => ErrorScreen(state.error!),
     redirect: (GoRouterState state){
