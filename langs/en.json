@@ -36,7 +36,7 @@
   "cancelled" : "Cancelled",
   "event_form_questionnaire" : "Event Form Questionnaire",
   "answer" : "Answer",
-  "submit_answers" : "Submit answers",
+  "submit_answers" : "Submit Answers",
   "answer_required" : "Answer required",
   "which_days_could_you_attend" : "Which days could you attend ?",
   "submit" : "Submit",
@@ -67,6 +67,7 @@
   "data_deletion_desc1" : "All data for past events is automatically deleted after 1 month by our robots. Profile data is automatically deleted when you delete your account according to GDRP rules. Should you have any additional concern please send and email to ",
   "data_deletion_desc2" : " with your email or UserID code (available in app on your account page) and we will manually ensure and confirm that all your data is deleted.",
   "meet_me_you_mobile_app_allows" : "MeetMeYou Mobile App allow for much more reply options and easier flow",
-  "install" : "Install"
+  "install" : "Install",
+  "signing_please_wait" : "Signing please wait...."
 
 }

@@ -190,9 +190,32 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(width: DimensionConstants.d80.w,
+                MediaQuery.of(context).size.width > 500 ? Container(width: DimensionConstants.d80.w,
                     alignment: Alignment.centerLeft,
-                    child: ImageView(path: ImageConstants.webLogo, width: DimensionConstants.d80.w,)),
+                    child: ImageView(path: ImageConstants.webLogo, width: DimensionConstants.d80.w,)) :
+               GestureDetector(
+                 onTap: () async {
+                   await provider.getEvent(context, provider.eventId.toString());
+
+                   provider.loginInfo.setLoginState(true);
+                   // for questionnaire answers
+                   if(provider.respondBtnStatus == "going" && provider.questionnaireKeysList.isNotEmpty){
+                     await provider.getAnswersQuestionnaireForm(context);
+                     if(provider.answers != null){
+                       answer1Controller.text = provider.answers!.s1Text!;
+                       answer2Controller.text = provider.answers!.s2Text!;
+                       answer3Controller.text = provider.answers!.s3Text!;
+                       answer4Controller.text = provider.answers!.s4Text!;
+                       answer5Controller.text = provider.answers!.s5Text!;
+                     }
+                   }
+
+                   // for getting multi dates
+                   if(provider.multipleDates){
+                     await provider.getMultiDates(context);
+                   }
+                 },
+                   child: ImageView(path: ImageConstants.mobileLogo, width: DimensionConstants.d80.w,)),
                 Expanded(
                   child: Container(
                     alignment: Alignment.center,
@@ -298,9 +321,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           child: Container(
             margin: EdgeInsets.symmetric(horizontal: DimensionConstants.d1.h),
              width: DimensionConstants.d440,
-              height:  DimensionConstants.d300,
+            //  height:  DimensionConstants.d300,
             child: GridView.builder(
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: provider.multiDates.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -392,7 +415,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: provider.answerMultiDate == true ? (){} : () async {
-        print(provider.didsOfMultiDateSelected);
+      //  print(provider.didsOfMultiDateSelected);
         if(provider.didsOfMultiDateSelected.isNotEmpty){
          await provider.unAttendMultiDate(context, provider.didsOfMultiDateSelected);
         }

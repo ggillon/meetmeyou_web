@@ -19,4 +19,5 @@ class ImageConstants {
   static const muchMore = "images/much_more.png";
   static const dataAndPrivacy = "images/data_and_privacy.jpg";
   static const dataDeletion = "images/data_deletion.jpg";
+  static const mobileLogo = "images/meetMeYou_mobile_logo.png";
  }

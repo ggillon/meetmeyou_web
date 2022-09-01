@@ -136,9 +136,12 @@ class EditProfileScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(width: DimensionConstants.d80.w,
+                MediaQuery.of(context).size.width > 500 ?  Container(width: DimensionConstants.d80.w,
                     alignment: Alignment.centerLeft,
-                    child: ImageView(path: ImageConstants.webLogo, width: DimensionConstants.d80.w,)),
+                    child: ImageView(path: ImageConstants.webLogo, width: DimensionConstants.d80.w,)) :
+            GestureDetector(
+                onTap: () async {},
+                child: ImageView(path: ImageConstants.mobileLogo, width: DimensionConstants.d80.w,)),
                 Expanded(
                   child: Container(
                     alignment: Alignment.center,

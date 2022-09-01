@@ -22,6 +22,7 @@ import 'package:meetmeyou_web/widgets/image_view.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:html' as html;
 
 class LoginInvitedScreen extends StatefulWidget {
   const LoginInvitedScreen({Key? key, required this.eid}) : super(key: key);
@@ -53,6 +54,7 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
     return BaseView<LoginInvitedProvider>(
         onModelReady: (provider) async {
           this.provider = provider;
+         // print(MediaQuery.of(context).size.width);
           bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
           bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
           bool isMac = Theme.of(context).platform == TargetPlatform.macOS;
@@ -71,7 +73,7 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
           //  provider.loginInfo.updateLoadingStatus(true);
         },
         builder: (context, provider, _) {
-          return provider.state == ViewState.Busy
+          return (provider.state == ViewState.Busy)
               ? Scaffold(
             key: _scaffoldkey,
                 body: Center(
@@ -92,7 +94,19 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
             key: _scaffoldkey,
             floatingActionButton: showFloatingBtn ? floatingActionBtn() : Container(),
             floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-                body: SafeArea(
+                body: provider.data == true ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircularProgressIndicator(),
+                      SizedBox(height: DimensionConstants.d5.h),
+                      Text("signing_please_wait".tr()).regularText(
+                          ColorConstants.primaryColor,
+                          DimensionConstants.d12.sp,
+                          TextAlign.left),
+                    ],
+                  ),
+                ) : SafeArea(
                     child: provider.eventResponse == null ?  Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -304,7 +318,7 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
           SizedBox(width: DimensionConstants.d4.w),
           Expanded(
             child: Text("meet_me_you_mobile_app_allows".tr()).mediumText(ColorConstants.colorWhite,
-                DimensionConstants.d14.sp, TextAlign.left, maxLines: 2, overflow: TextOverflow.ellipsis),
+                DimensionConstants.d14.sp, TextAlign.left, maxLines: 3, overflow: TextOverflow.ellipsis),
           ),
           SizedBox(width: DimensionConstants.d8.w),
           installBtn()
@@ -317,14 +331,18 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
     return GestureDetector(
       onTap: (){
      //   launch("https://play.google.com/store/apps/details?id=com.meetmeyou.meetmeyou");
+     //    if(Theme.of(context).platform == TargetPlatform.iOS){
+     //      launchUrl(
+     //          Uri.parse("https://apps.apple.com/ke/app/meetmeyou/id1580553300"), mode: LaunchMode.externalApplication);
+     //    } else if(Theme.of(context).platform == TargetPlatform.android){
+     //      launchUrl(
+     //          Uri.parse("https://play.google.com/store/apps/details?id=com.meetmeyou.meetmeyou&gl=GB"), mode: LaunchMode.externalApplication);
+     //    }
         if(Theme.of(context).platform == TargetPlatform.iOS){
-          launchUrl(
-              Uri.parse("https://apps.apple.com/ke/app/meetmeyou/id1580553300"), mode: LaunchMode.externalApplication);
+          html.window.open('https://apps.apple.com/ke/app/meetmeyou/id1580553300', 'new tab');
         } else if(Theme.of(context).platform == TargetPlatform.android){
-          launchUrl(
-              Uri.parse("https://play.google.com/store/apps/details?id=com.meetmeyou.meetmeyou&gl=GB"), mode: LaunchMode.externalApplication);
+          html.window.open('https://play.google.com/store/apps/details?id=com.meetmeyou.meetmeyou&gl=GB', 'new tab1');
         }
-
       },
       child: Container(
         padding: EdgeInsets.symmetric(

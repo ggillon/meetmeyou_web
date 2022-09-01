@@ -54,8 +54,16 @@ Future<bool> getEvent(BuildContext context, String eid) async{
   }
 }
 
+bool startData = false;
+
+updateStartData(bool val){
+  startData = val;
+  notifyListeners();
+}
+
+
 Future<void> signInWithGoogle(BuildContext context) async {
-  updateData(true);
+  updateStartData(true);
   var user = await auth.signInWithGoogle().catchError((e) {
     updateData(false);
     DialogHelper.showDialogWithOneButton(context, "error".tr(), e.message,
@@ -95,7 +103,7 @@ Future<void> signInWithGoogle(BuildContext context) async {
 }
 
 Future<void> signInWithFb(BuildContext context) async {
-  updateData(true);
+  updateStartData(true);
   var user = await auth.signInWithFacebook().catchError((e) {
     updateData(false);
     DialogHelper.showDialogWithOneButton(context, "error".tr(), e.message);
@@ -130,7 +138,7 @@ Future<void> signInWithFb(BuildContext context) async {
 
 
 Future<void> signInWithApple(BuildContext context) async {
-  updateData(true);
+  updateStartData(true);
   var user = await auth.signInWithApple().catchError((e) {
     updateData(false);
     DialogHelper.showDialogWithOneButton(context, "error".tr(), e.message);
