@@ -174,6 +174,7 @@ Future<void> login(
     DialogHelper.showMessage(context, e.message);
   });
 
+  SharedPreference.prefs!.setString(SharedPreference.userId, user!.uid.toString());
   //SharedPreference.prefs!.setString(SharedPreference.currentUser, jsonEncode(user.));
 
 }

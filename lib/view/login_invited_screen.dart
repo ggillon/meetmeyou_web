@@ -227,17 +227,18 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
           SizedBox(height: DimensionConstants.d10.h),
           socialMediaLoginBtn(
               "sign_up_with_google".tr(), ImageConstants.ic_google, onTap: () {
-          //   SharedPreference.prefs!.setString(SharedPreference.userId, "ZKsRCGO51CWRh4NslebxT3ZsEBY2");
-          //   provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
-          //   provider.loginInfo.setLoginState(true);
-          //   provider.loginInfo.setLogoutState(false);
-          // context.go(RouteConstants.eventDetailScreen);
-              provider.data == true
-                  ? const Center(
-                child:
-                CircularProgressIndicator(),
-              )
-                  : provider.signInWithGoogle(context);
+          //  SharedPreference.prefs!.setString(SharedPreference.userId, "ZKsRCGO51CWRh4NslebxT3ZsEBY2");
+            provider.login(context);
+            provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+            provider.loginInfo.setLoginState(true);
+            provider.loginInfo.setLogoutState(false);
+          context.go(RouteConstants.eventDetailScreen);
+              // provider.data == true
+              //     ? const Center(
+              //   child:
+              //   CircularProgressIndicator(),
+              // )
+              //     : provider.signInWithGoogle(context);
           }),
           SizedBox(height: DimensionConstants.d10.h),
           socialMediaLoginBtn(

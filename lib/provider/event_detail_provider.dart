@@ -20,7 +20,7 @@ import 'dart:io';
 class EventDetailProvider extends BaseProvider {
   final userUid = SharedPreference.prefs!.getString(SharedPreference.userId);
   final eventId = SharedPreference.prefs!.getString(SharedPreference.eventId);
- // MMYEngine? mmyEngine;
+  MMYEngine? mmyEngine;
 //  Event? eventResponse;
   GetEventResponse? eventResponse;
   InvitedContacts? invitedContacts;

@@ -68,6 +68,15 @@
   "data_deletion_desc2" : " with your email or UserID code (available in app on your account page) and we will manually ensure and confirm that all your data is deleted.",
   "meet_me_you_mobile_app_allows" : "MeetMeYou Mobile App allow for much more reply options and easier flow",
   "install" : "Install",
-  "signing_please_wait" : "Signing please wait...."
-
+  "signing_please_wait" : "Signing please wait....",
+  "check_event_responses" : "Check event responses",
+  "photo_gallery" : "Photo Gallery",
+  "attending" : "Attending",
+  "non_attending" : "Non-Attending",
+  "invited" : "Invited",
+  "fetching_gallery" : "Fetching gallery",
+  "no_photos_yet" : "No photos yet......",
+  "edit" : "Edit",
+  "loading_contacts": "Loading Contacts....",
+  "sorry_no_contacts_found": "Sorry no contacts found"
 }

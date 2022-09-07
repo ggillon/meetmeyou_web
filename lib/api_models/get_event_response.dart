@@ -15,6 +15,7 @@ class GetEventResponse {
 
   InvitedContacts? invitedContacts;
   QuestionForm? form;
+  Params? params;
 
   GetEventResponse(
       {this.timeStamp,
@@ -45,6 +46,7 @@ class GetEventResponse {
     end = json['end'];
     invitedContacts = json['invitedContacts'] != null ? InvitedContacts(json['invitedContacts']) : null;
     form = json['form'] != null ? QuestionForm(json['form']) : null;
+    params = json['params'] != null ? Params.fromJson(json['params']) : null;
   }
 }
 
@@ -79,4 +81,19 @@ class QuestionForm{
     }
   }
 }
+
+class Params{
+  bool? attendanceVisibility;
+  bool? photoAlbum;
+
+  Params.fromJson(Map<String, dynamic> json){
+    if(json['AttendanceVisibility'] != null){
+      attendanceVisibility = json['AttendanceVisibility'];
+    }
+    if(json['photoAlbum'] != null){
+      photoAlbum = json['photoAlbum'];
+    }
+  }
+}
+
 

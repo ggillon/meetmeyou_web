@@ -8,4 +8,5 @@ class UserDetail{
   String? profileUrl;
   String? address;
   String? cid;
+
 }

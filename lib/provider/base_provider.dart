@@ -5,6 +5,7 @@ import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
 import 'package:meetmeyou_web/main.dart';
+import 'package:meetmeyou_web/models/event_detail.dart';
 import 'package:meetmeyou_web/models/profile.dart';
 import 'package:meetmeyou_web/models/user_detail.dart';
 import 'package:meetmeyou_web/services/api.dart';
@@ -21,6 +22,7 @@ class BaseProvider extends ChangeNotifier {
   bool get isDisposed => _isDisposed;
   AuthBase auth = locator<AuthBase>();
   UserDetail userDetail = locator<UserDetail>();
+  EventDetail eventDetail = locator<EventDetail>();
   Api api = locator<Api>();
 
 

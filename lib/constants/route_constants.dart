@@ -4,4 +4,6 @@ class RouteConstants{
   static const String viewProfileScreen = "/viewProfileScreen";
   static const String editProfileScreen = "/editProfileScreen";
   static const String homePage = "/homePage";
+  static const String eventGalleryPage = "/eventGalleryPage";
+  static const String eventAttendingScreen = "/eventAttendingScreen";
 }

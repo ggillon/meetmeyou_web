@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,9 @@ import 'package:meetmeyou_web/provider/base_provider.dart';
 import 'package:meetmeyou_web/provider/login_invited_provider.dart';
 import 'package:meetmeyou_web/services/auth/auth.dart';
 import 'package:meetmeyou_web/view/edit_profile_screen.dart';
+import 'package:meetmeyou_web/view/event_attending_screen.dart';
 import 'package:meetmeyou_web/view/event_detail_screen.dart';
+import 'package:meetmeyou_web/view/event_gallery_page.dart';
 import 'package:meetmeyou_web/view/home_page.dart';
 import 'package:meetmeyou_web/view/login_invited_screen.dart';
 import 'package:meetmeyou_web/view/view_profile_screen.dart';
@@ -37,6 +40,8 @@ Future<void> main() async {
     ),
   );
   await EasyLocalization.ensureInitialized();
+  // Disable persistence on web platforms
+  await FirebaseAuth.instance.setPersistence(Persistence.SESSION);
   SharedPreference.prefs = await SharedPreferences.getInstance();
   setupLocator();
   // check if is running on Web
@@ -102,6 +107,18 @@ class MyApp extends StatelessWidget {
         path: RouteConstants.editProfileScreen,
         builder: (BuildContext context, GoRouterState state) {
           return EditProfileScreen();
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.eventGalleryPage,
+        builder: (BuildContext context, GoRouterState state) {
+          return EventGalleryPage();
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.eventAttendingScreen,
+        builder: (BuildContext context, GoRouterState state) {
+          return EventAttendingScreen();
         },
       ),
       // GoRoute(

@@ -19,6 +19,7 @@ import 'profile.dart' as profileLib;
 import 'contact.dart' as contactLib;
 import 'event.dart' as eventLib;
 import 'event_answer.dart' as answerLib;
+import 'photo_album.dart' as albumLib;
 import 'package:meetmeyou_web/services/storage/storage.dart' as storageLib;
 
 
@@ -52,6 +53,8 @@ abstract class MMYEngine {
 
   /// Get a contact, invitation or group from DB
   Future<Contact> getContact(String cid);
+  /// Get a contact from a profile reference;
+  Future<Contact?> getContactFromProfile(String uid);
 
   /// EVENT ///
   /// Get a particular Event
@@ -66,7 +69,20 @@ abstract class MMYEngine {
   ///  Get reply to form to an event
   Future<List<EventAnswer>> getAnswersEventForm(String eid);
 
+  /// PHOTO ALBUM FUNCTIONS
 
+  /// Create an album for event
+  Future<MMYPhotoAlbum> createEventAlbum(String eid);
+  /// Get photo Album
+  Future<MMYPhotoAlbum> getPhotoAlbum(String aid);
+  /// Post photo
+  Future<void> postPhoto(String aid, String photoURL);
+  /// Delete photo
+  Future<void> deletePhoto(String aid, String pid);
+
+  ///
+ /// Get event parameter
+  Future<dynamic> getEventParam(String eid, {required String param, });
 }
 
 class MMY implements MMYEngine {
@@ -128,6 +144,11 @@ class MMY implements MMYEngine {
   }
 
   @override
+  Future<Contact?> getContactFromProfile(String uid) {
+    return contactLib.getContactFromProfile(_currentUser, uid: uid);
+  }
+
+  @override
   Future<Event> getEvent(String eid) async {
     return await eventLib.getEvent(_currentUser, eid);
   }
@@ -156,6 +177,29 @@ class MMY implements MMYEngine {
     return answerLib.getAnswersEventForm(_currentUser, eid);
   }
 
+  @override
+  Future<MMYPhotoAlbum> createEventAlbum(String eid) async {
+    return await albumLib.createEventAlbum(_currentUser, eid);
+  }
 
+  @override
+  Future<void> deletePhoto(String aid, String pid) async {
+    albumLib.deletePhoto(_currentUser, aid, pid);
+  }
+
+  @override
+  Future<MMYPhotoAlbum> getPhotoAlbum(String aid) async {
+    return await albumLib.getAlbum(_currentUser, aid);
+  }
+
+  @override
+  Future<void> postPhoto(String aid, String photoURL) async {
+    await albumLib.postPhoto(_currentUser, aid, photoURL);
+  }
+
+  @override
+  Future<dynamic> getEventParam(String eid, {required String param}) async {
+    return await eventLib.getParam(_currentUser, eid, param);
+  }
 }
 

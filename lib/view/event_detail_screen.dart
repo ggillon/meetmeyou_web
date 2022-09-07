@@ -138,7 +138,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   provider.respondBtnStatus.tr(),
                                   provider.respondBtnColor,
                                   provider.respondBtnTextColor, onTapFun: () {
-                                      respondBtnDialog(context);
+                                provider.respondBtnStatus == "edit" ? Container() : respondBtnDialog(context);
                               }, width: MediaQuery.of(context).size.width/1.2),
                             ),
                             SizedBox(height: DimensionConstants.d15.h),
@@ -154,6 +154,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                     DimensionConstants.d12.sp, TextAlign.left,
                                     maxLines: 5,
                                     overflow: TextOverflow.ellipsis),
+                            SizedBox(height: DimensionConstants.d25.h),
+                            provider.eventResponse?.params?.photoAlbum == true ? photoGalleryCard(context) : Container(),
+                            provider.eventResponse?.params?.photoAlbum == true ? SizedBox(height: DimensionConstants.d15.h) : Container(),
+                            checkAvailabilitiesCard(context),
                             SizedBox(height: DimensionConstants.d15.h),
                             Align(
                               alignment: Alignment.center,
@@ -244,7 +248,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             DimensionConstants.d14.sp, TextAlign.left),
                       ),
                     ],
-                    offset: Offset(0, 50),
+                    offset: const Offset(0, 50),
                     color: Colors.white,
                     elevation: 2,
                     icon: Icon(Icons.menu, color: ColorConstants.primaryColor, size: 30),
@@ -439,6 +443,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     );
   }
 
+  /// questionairre~~~~~~~~~~
   alertForQuestionnaireAnswers(BuildContext context,
       List<String> questionsList, EventDetailProvider provider) {
     return showDialog(
@@ -565,5 +570,91 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       case 4:
         return answer5Controller;
     }
+  }
+  ///~~~~~~~~~~~~~
+///
+
+  Widget photoGalleryCard(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d15.w),
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          provider.eventDetail.eventTitle = provider.eventResponse?.title ?? "";
+          provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+          provider.loginInfo.setLoginState(false);
+          provider.loginInfo.setLogoutState(true);
+          provider.updateLoadingStatus(true);
+          context.go(RouteConstants.eventGalleryPage);
+        },
+        child: Card(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(DimensionConstants.d8.r))),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d5.w, vertical: DimensionConstants.d8.h),
+            child: Row(
+              children: [
+                MediaQuery.of(context).size.width > 900 ? Container() : SizedBox(width: DimensionConstants.d5.w),
+                const Icon(Icons.picture_in_picture_alt_outlined),
+                SizedBox(width: DimensionConstants.d5.w),
+                Expanded(
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text("photo_gallery".tr()).mediumText(
+                          ColorConstants.colorBlack,
+                          DimensionConstants.d14.sp,
+                          TextAlign.left,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis),
+                    )),
+                SizedBox(width: DimensionConstants.d5.w),
+               const Icon(Icons.arrow_forward_ios)
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget checkAvailabilitiesCard(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d15.w),
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+          provider.loginInfo.setLoginState(false);
+          provider.loginInfo.setLogoutState(true);
+          provider.updateLoadingStatus(true);
+          context.go(RouteConstants.eventAttendingScreen);
+        },
+        child: Card(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(DimensionConstants.d8.r))),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d5.w, vertical: DimensionConstants.d8.h),
+            child: Row(
+              children: [
+                MediaQuery.of(context).size.width > 900 ? Container() : SizedBox(width: DimensionConstants.d5.w),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text("check_event_responses".tr()).mediumText(
+                        ColorConstants.colorBlack,
+                        DimensionConstants.d14.sp,
+                        TextAlign.left,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                ),
+                SizedBox(width: DimensionConstants.d5.w),
+                const Icon(Icons.arrow_forward_ios)
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
