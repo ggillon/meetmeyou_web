@@ -6,7 +6,7 @@ import 'package:meetmeyou_web/constants/color_constants.dart';
 import 'package:meetmeyou_web/constants/dimension_constants.dart';
 import 'package:meetmeyou_web/constants/image_constants.dart';
 import 'package:meetmeyou_web/constants/route_constants.dart';
-import 'package:meetmeyou_web/dialog_helper.dart';
+import 'package:meetmeyou_web/helper/dialog_helper.dart';
 import 'package:meetmeyou_web/extensions/all_extensions.dart';
 import 'package:meetmeyou_web/helper/date_time_helper.dart';
 import 'package:meetmeyou_web/locator.dart';
@@ -63,7 +63,7 @@ class CommonWidgets{
                             DimensionConstants.d14.sp, TextAlign.left),
                       ),
                     ],
-                    offset: Offset(0, 50),
+                    offset: const Offset(0, 50),
                     color: Colors.white,
                     elevation: 2,
                     icon: Icon(Icons.menu, color: ColorConstants.primaryColor, size: 30),
@@ -315,4 +315,144 @@ class CommonWidgets{
      ),
    );
  }
+
+ /// user profile card~~~~~~~~
+ ///
+ static Widget userContactCard(BuildContext context, String email, String contactName,
+     {String? profileImg,
+       String? searchStatus,
+       bool search = false,
+       VoidCallback? addIconTapAction,
+       VoidCallback? deleteIconTapAction,
+       bool invitation = false, bool currentUser = false, bool? isFavouriteContact}) {
+   return Column(children: [
+     Card(
+       color: invitation
+           ? ColorConstants.primaryColor
+           :  currentUser == true ? ColorConstants.colorNewGray.withOpacity(0.3) : ColorConstants.colorWhite,
+       elevation: 3.0,
+       shadowColor: currentUser == true ? ColorConstants.colorNewGray.withOpacity(0.1) : ColorConstants.colorWhite,
+       shape: RoundedRectangleBorder(
+           borderRadius: BorderRadius.all(Radius.circular(DimensionConstants.d10.r))),
+       child: Padding(
+         padding: const EdgeInsets.all(DimensionConstants.d10),
+         child: Row(
+           mainAxisAlignment: MainAxisAlignment.center,
+           children: [
+             profileCardImageDesign(context, profileImg!),
+             SizedBox(width: DimensionConstants.d8.w),
+             profileCardNameAndEmailDesign(contactName, email,
+                 search: true, searchStatus: searchStatus, isFavouriteContact: isFavouriteContact),
+             currentUser == true ? Container() : iconStatusCheck(
+                 searchStatus: search ? searchStatus : "",
+                 addIconTap: search ? addIconTapAction : () {},
+                 deleteIconTap: search ? deleteIconTapAction ?? () {} : () {}
+             )
+           ],
+         ),
+       ),
+     ),
+     SizedBox(height: DimensionConstants.d5.h)
+   ]);
+ }
+
+ static Widget profileCardImageDesign(BuildContext context, String profileImg) {
+   return Stack(
+     clipBehavior: Clip.none,
+     children: [
+       ClipRRect(
+           borderRadius: BorderRadius.all(Radius.circular(DimensionConstants.d10.r)),
+           child: profileImg == null
+               ? Container(
+             color: ColorConstants.primaryColor,
+             width: MediaQuery.of(context).size.width > 800 ? DimensionConstants.d90 : DimensionConstants.d60,
+             height: MediaQuery.of(context).size.width > 800 ? DimensionConstants.d90 : DimensionConstants.d60,
+           )
+               : Container(
+             width: MediaQuery.of(context).size.width > 800 ? DimensionConstants.d90 : DimensionConstants.d60,
+             height: MediaQuery.of(context).size.width > 800 ? DimensionConstants.d90 : DimensionConstants.d60,
+             child: ImageView(
+               path: profileImg,
+               width: MediaQuery.of(context).size.width > 800 ? DimensionConstants.d90 : DimensionConstants.d60,
+               height: MediaQuery.of(context).size.width > 800 ? DimensionConstants.d90 : DimensionConstants.d60,
+               // fit: BoxFit.contain,
+             ),
+           )),
+       const Positioned(
+           top: 25,
+           right: -5,
+           child: ImageView(path: ImageConstants.small_logo_icon))
+     ],
+   );
+ }
+
+ static Widget profileCardNameAndEmailDesign(
+     String contactName, String email,
+     {bool search = false, String? searchStatus, bool? isFavouriteContact}) {
+   return Expanded(
+     child: Column(
+       crossAxisAlignment: CrossAxisAlignment.start,
+       children: [
+         Row(
+           children: [
+             Text(contactName.capitalize()).semiBoldText(ColorConstants.colorBlack,
+                 DimensionConstants.d14.sp, TextAlign.left,
+                 maxLines: 1, overflow: TextOverflow.ellipsis),
+             isFavouriteContact == true ?  Icon(Icons.star, color: ColorConstants.primaryColor, size: 20,) : Container()
+           ],
+         ),
+         SizedBox(height: DimensionConstants.d5.h),
+         Text(emailOrTextStatusCheck(searchStatus ?? "", email)).regularText(
+             ColorConstants.colorBlackDown,
+             DimensionConstants.d11.sp,
+             TextAlign.left,
+             maxLines: 1,
+             overflow: TextOverflow.ellipsis),
+       ],
+     ),
+   );
+ }
+
+ static Widget iconStatusCheck(
+     {String? searchStatus,
+       VoidCallback? addIconTap,
+       VoidCallback? deleteIconTap}) {
+   if (searchStatus == "Listed profile") {
+     return GestureDetector(
+       onTap: addIconTap,
+       child: CircleAvatar(
+           backgroundColor: ColorConstants.colorGray,
+           radius: 12,
+           child: const ImageView(path: ImageConstants.small_add_icon)),
+     );
+   } else if (searchStatus == "Confirmed contact") {
+     return Container();
+   } else if (searchStatus == "Invited contact") {
+     return GestureDetector(
+       onTap: () {},
+       child: const ImageView(path: ImageConstants.invited_waiting_icon),
+     );
+   } else if (searchStatus == "Event Edit") {
+     return GestureDetector(
+       // onTap: deleteIconTap,
+         child: const ImageView(path: ImageConstants.contact_arrow_icon)
+       //ImageView(path: ImageConstants.event_remove_icon),
+     );
+   } else {
+     return const ImageView(path: ImageConstants.contact_arrow_icon);
+   }
+ }
+
+ static emailOrTextStatusCheck(String searchStatus, String email) {
+   if (searchStatus == "Listed profile") {
+     return "click_+_to_send_invitation".tr();
+   } else if (searchStatus == "Confirmed contact") {
+     return "already_a_contact".tr();
+   } else if (searchStatus == "Invited contact") {
+     return "invitation_waiting_reply".tr();
+   } else {
+     return email;
+   }
+ }
+
 }

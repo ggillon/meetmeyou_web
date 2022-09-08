@@ -64,24 +64,28 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       onModelReady: (provider) async {
         this.provider = provider;
         provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
-        await provider.getEvent(context, provider.eventId.toString());
+        await provider.getEvent(context, provider.eventId.toString()).then((value) async {
+          await provider.getUserProfile(context);
+        });
 
         provider.loginInfo.setLoginState(true);
         // for questionnaire answers
        if(provider.respondBtnStatus == "going" && provider.questionnaireKeysList.isNotEmpty){
-         await provider.getAnswersQuestionnaireForm(context);
-         if(provider.answers != null){
-           answer1Controller.text = provider.answers!.s1Text!;
-           answer2Controller.text = provider.answers!.s2Text!;
-           answer3Controller.text = provider.answers!.s3Text!;
-           answer4Controller.text = provider.answers!.s4Text!;
-           answer5Controller.text = provider.answers!.s5Text!;
-         }
+           provider.getAnswerEventForm(context, provider.eventId.toString(), provider.auth.currentUser!.uid.toString()).then((value) {
+             if(provider.eventAnswer != null){
+               answer1Controller.text = provider.eventAnswer![provider.questionnaireKeysList[0]];
+               answer2Controller.text = provider.eventAnswer!.length >=2 ? provider.eventAnswer![provider.questionnaireKeysList[1]] : "";
+               answer3Controller.text = provider.eventAnswer!.length >=3 ? provider.eventAnswer![provider.questionnaireKeysList[2]] : "";
+               answer4Controller.text = provider.eventAnswer!.length >=4 ? provider.eventAnswer![provider.questionnaireKeysList[3]] : "";
+               answer5Controller.text = provider.eventAnswer!.length >=5 ? provider.eventAnswer![provider.questionnaireKeysList[4]] : "";
+             }
+           });
+
        }
 
        // for getting multi dates
         if(provider.multipleDates){
-          await provider.getMultiDates(context);
+          await provider.getMultipleDateOptionsFromEvent(context, provider.eventId.toString());
         }
 
       },
@@ -101,7 +105,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 ),
               )
             : SafeArea(
-              child: SingleChildScrollView(
+              child: provider.event == null ?  Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: DimensionConstants.d5.h),
+                    Text("no_event_found".tr()).regularText(
+                        ColorConstants.primaryColor,
+                        DimensionConstants.d12.sp,
+                        TextAlign.left),
+                  ],
+                ),
+              ) : SingleChildScrollView(
                   child: Column(
                     children: [
                       commonAppBar(context, true,
@@ -120,12 +135,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               clipBehavior: Clip.none,
                               alignment: Alignment.bottomCenter,
                               children: [
-                                CommonWidgets.imageView(context, provider.eventResponse?.photoURL ?? ""),
+                                CommonWidgets.imageView(context, provider.event?.photoURL ?? ""),
                                 Positioned(
                                   bottom: -DimensionConstants.d75,
-                                  child: CommonWidgets.titleDateLocationCard(context, provider.eventResponse?.title ?? "",  DateTime.fromMillisecondsSinceEpoch(provider.eventResponse?.start ?? "")
-                                      , DateTime.fromMillisecondsSinceEpoch(provider.eventResponse?.end ?? ""), provider.eventResponse?.location ?? "",
-                                      provider.eventResponse?.organiserName ?? ""),
+                                  child: CommonWidgets.titleDateLocationCard(context, provider.event?.title ?? "",  provider.event!.start
+                                      , provider.event!.end, provider.event?.location ?? "",
+                                      provider.event?.organiserName ?? ""),
                                 )
                               ],
                             ),
@@ -138,7 +153,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   provider.respondBtnStatus.tr(),
                                   provider.respondBtnColor,
                                   provider.respondBtnTextColor, onTapFun: () {
-                                provider.respondBtnStatus == "edit" ? Container() : respondBtnDialog(context);
+                               ( provider.respondBtnStatus == "edit" || provider.respondBtnStatus == "") ? Container() : respondBtnDialog(context);
                               }, width: MediaQuery.of(context).size.width/1.2),
                             ),
                             SizedBox(height: DimensionConstants.d15.h),
@@ -149,14 +164,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis),
                             SizedBox(height: DimensionConstants.d10.h),
-                            Text(provider.eventResponse?.description ?? "")
+                            Text(provider.event?.description ?? "")
                                 .regularText(ColorConstants.colorGray,
                                     DimensionConstants.d12.sp, TextAlign.left,
                                     maxLines: 5,
                                     overflow: TextOverflow.ellipsis),
                             SizedBox(height: DimensionConstants.d25.h),
-                            provider.eventResponse?.params?.photoAlbum == true ? photoGalleryCard(context) : Container(),
-                            provider.eventResponse?.params?.photoAlbum == true ? SizedBox(height: DimensionConstants.d15.h) : Container(),
+                            provider.event?.params['photoAlbum'] == true ? photoGalleryCard(context) : Container(),
+                            provider.event?.params['photoAlbum'] == true ? SizedBox(height: DimensionConstants.d15.h) : Container(),
                             checkAvailabilitiesCard(context),
                             SizedBox(height: DimensionConstants.d15.h),
                             Align(
@@ -199,25 +214,29 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     child: ImageView(path: ImageConstants.webLogo, width: DimensionConstants.d80.w,)) :
                GestureDetector(
                  onTap: () async {
-                   await provider.getEvent(context, provider.eventId.toString());
+                   await provider.getEvent(context, provider.eventId.toString()).then((value) async {
+                     await provider.getUserProfile(context);
+                   });
 
                    provider.loginInfo.setLoginState(true);
                    // for questionnaire answers
                    if(provider.respondBtnStatus == "going" && provider.questionnaireKeysList.isNotEmpty){
-                     await provider.getAnswersQuestionnaireForm(context);
-                     if(provider.answers != null){
-                       answer1Controller.text = provider.answers!.s1Text!;
-                       answer2Controller.text = provider.answers!.s2Text!;
-                       answer3Controller.text = provider.answers!.s3Text!;
-                       answer4Controller.text = provider.answers!.s4Text!;
-                       answer5Controller.text = provider.answers!.s5Text!;
-                     }
+                     provider.getAnswerEventForm(context, provider.eventId.toString(), provider.auth.currentUser!.uid.toString()).then((value) {
+                       if(provider.eventAnswer != null){
+                         answer1Controller.text = provider.eventAnswer![provider.questionnaireKeysList[0]];
+                         answer2Controller.text = provider.eventAnswer!.length >=2 ? provider.eventAnswer![provider.questionnaireKeysList[1]] : "";
+                         answer3Controller.text = provider.eventAnswer!.length >=3 ? provider.eventAnswer![provider.questionnaireKeysList[2]] : "";
+                         answer4Controller.text = provider.eventAnswer!.length >=4 ? provider.eventAnswer![provider.questionnaireKeysList[3]] : "";
+                         answer5Controller.text = provider.eventAnswer!.length >=5 ? provider.eventAnswer![provider.questionnaireKeysList[4]] : "";
+                       }
+                     });
                    }
 
                    // for getting multi dates
                    if(provider.multipleDates){
-                     await provider.getMultiDates(context);
+                     await provider.getMultipleDateOptionsFromEvent(context, provider.eventId.toString());
                    }
+
                  },
                    child: ImageView(path: ImageConstants.mobileLogo, width: DimensionConstants.d80.w,)),
                 Expanded(
@@ -285,17 +304,21 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         builder: (BuildContext context) =>
             CustomDialog(
               goingClick: () {
-                if(provider.questionsList.isNotEmpty){
+                List<String> questionsList = [];
+                for (var value in provider.eventDetail.event!.form.values) {
+                  questionsList.add(value);
+                }
+                if(questionsList.isNotEmpty){
                   Navigator.of(context).pop();
-                  alertForQuestionnaireAnswers(context, provider.questionsList, provider);
+                  alertForQuestionnaireAnswers(context, questionsList, provider);
                 } else{
                   Navigator.of(context).pop();
-                  provider.replyToEvent(_scaffoldkey.currentContext!, ApiConstants.attendEvent);
+                  provider.replyToEvent(_scaffoldkey.currentContext!, provider.eventId.toString(), EVENT_ATTENDING);
                 }
               },
               notGoingClick: () {
                 Navigator.of(context).pop();
-                provider.replyToEvent(_scaffoldkey.currentContext!, ApiConstants.unAttendEvent);
+                provider.replyToEvent(_scaffoldkey.currentContext!, provider.eventId.toString(), EVENT_NOT_ATTENDING);
               },
               cancelClick: () {
                 Navigator.of(context).pop();
@@ -329,7 +352,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             child: GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: provider.multiDates.length,
+              itemCount: provider.multipleDate.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   crossAxisSpacing: 10.0,
@@ -367,13 +390,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         GestureDetector(
           onTap: provider.answerMultiDate == true ? (){} : (){
              provider.selectedMultiDateIndex = index;
-            if(provider.didAttendedDate.contains(provider.multiDates[index].did)){
-              provider.didAttendedDate.remove(provider.multiDates[index].did);
-              provider.didsOfMultiDateSelected.add(provider.multiDates[index].did.toString());
-            } else{
-              provider.didAttendedDate.add(provider.multiDates[index].did.toString());
-              provider.didsOfMultiDateSelected.remove(provider.multiDates[index].did);
-            }
+             if(provider.multiDateDidsList.contains(provider.multipleDate[index].did)){
+               provider.multiDateDidsList.remove(provider.multipleDate[index].did);
+               provider.didsOfMultiDateSelected.add(provider.multipleDate[index].did);
+             } else{
+               provider.multiDateDidsList.add(provider.multipleDate[index].did);
+               provider.didsOfMultiDateSelected.remove(provider.multipleDate[index].did);
+             }
             provider.updateLoadingStatus(true);
           },
           child: Container(
@@ -386,7 +409,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 borderRadius: BorderRadius.circular(DimensionConstants.d8.r),
                 boxShadow: [
                   BoxShadow(color:
-                  provider.didAttendedDate.contains(provider.multiDates[index].did)
+                  provider.multiDateDidsList.contains(provider.multipleDate[index].did)
                       ? ColorConstants.primaryColor : ColorConstants.colorWhitishGray,
                       spreadRadius: 1)
                 ]),
@@ -394,14 +417,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(height: DimensionConstants.d2.h),
-                Text("${DateTimeHelper.getMonthByName(DateTime.fromMillisecondsSinceEpoch(provider.multiDates[index].start!.toInt()))} "
-                    " ${DateTime.fromMillisecondsSinceEpoch(provider.multiDates[index].start!.toInt()).year}")
+                Text("${DateTimeHelper.getMonthByName(provider.multipleDate[index].start)} "
+                    " ${provider.multipleDate[index].start.year}")
                     .semiBoldText(Colors.deepOrangeAccent, DimensionConstants.d12.sp, TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
                 SizedBox(height: DimensionConstants.d2.h),
-                Text(DateTime.fromMillisecondsSinceEpoch(provider.multiDates[index].start!.toInt()).day.toString())
+                Text(provider.multipleDate[index].start.day.toString())
                     .boldText(ColorConstants.colorBlack, DimensionConstants.d15.sp, TextAlign.center),
                 SizedBox(height: DimensionConstants.d2.h),
-                Text("${DateTimeHelper.convertEventDateToTimeFormat(DateTime.fromMillisecondsSinceEpoch(provider.multiDates[index].start!.toInt()))}")
+                Text("${DateTimeHelper.convertEventDateToTimeFormat(provider.multipleDate[index].start)}")
                     .regularText(ColorConstants.colorGray, 10.5, TextAlign.center,
                     maxLines: 1, overflow: TextOverflow.ellipsis),
                 SizedBox(height: DimensionConstants.d2.h),
@@ -420,11 +443,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       behavior: HitTestBehavior.translucent,
       onTap: provider.answerMultiDate == true ? (){} : () async {
       //  print(provider.didsOfMultiDateSelected);
+        /// unattend
         if(provider.didsOfMultiDateSelected.isNotEmpty){
-         await provider.unAttendMultiDate(context, provider.didsOfMultiDateSelected);
+         await provider.answerMultiDateOption(context, provider.didsOfMultiDateSelected, false);
         }
-        if(provider.didAttendedDate.isNotEmpty){
-          await provider.attendMultiDate(context, provider.didAttendedDate);
+        /// attend
+        if(provider.multiDateDidsList.isNotEmpty){
+          await provider.answerMultiDateOption(context, provider.multiDateDidsList, true);
         }
       },
       child: Card(
@@ -507,32 +532,35 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       GestureDetector(
                           onTap: () {
                             if (_formKey.currentState!.validate()) {
-                            //  final Map<String, dynamic> answersMap = {};
-                              // for(int i = 0; i < provider.questionnaireKeysList.length; i++){
-                              //   if(i == 0){
-                              //     answersMap.addAll({
-                              //       provider.questionnaireKeysList[i]: answer1Controller.text
-                              //     });
-                              //   } else if(i == 1){
-                              //     answersMap.addAll({
-                              //       provider.questionnaireKeysList[i]: answer2Controller.text
-                              //     });
-                              //   } else if(i == 2){
-                              //     answersMap.addAll({
-                              //       provider.questionnaireKeysList[i]: answer3Controller.text
-                              //     });
-                              //   } else if(i == 3){
-                              //     answersMap.addAll({
-                              //       provider.questionnaireKeysList[i]: answer4Controller.text
-                              //     });
-                              //   } else if(i == 4){
-                              //     answersMap.addAll({
-                              //       provider.questionnaireKeysList[i]: answer5Controller.text
-                              //     });
-                              //   }
-                              // }
+                             final Map<String, dynamic> answersMap = {};
+                              for(int i = 0; i < provider.questionnaireKeysList.length; i++){
+                                if(i == 0){
+                                  answersMap.addAll({
+                                    provider.questionnaireKeysList[i]: answer1Controller.text
+                                  });
+                                } else if(i == 1){
+                                  answersMap.addAll({
+                                    provider.questionnaireKeysList[i]: answer2Controller.text
+                                  });
+                                } else if(i == 2){
+                                  answersMap.addAll({
+                                    provider.questionnaireKeysList[i]: answer3Controller.text
+                                  });
+                                } else if(i == 3){
+                                  answersMap.addAll({
+                                    provider.questionnaireKeysList[i]: answer4Controller.text
+                                  });
+                                } else if(i == 4){
+                                  answersMap.addAll({
+                                    provider.questionnaireKeysList[i]: answer5Controller.text
+                                  });
+                                }
+                              }
                               Navigator.of(context).pop();
-                             provider.answerToQuestionnaireForm(context, answer1Controller.text, answer2Controller.text, answer3Controller.text, answer4Controller.text, answer5Controller.text);
+                             provider.answersToEventQuestionnaire(
+                                 _scaffoldkey.currentContext!,
+                                 provider.eventId.toString(),
+                                 answersMap);
                             }
                           },
                           child: Container(
@@ -580,7 +608,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () {
-          provider.eventDetail.eventTitle = provider.eventResponse?.title ?? "";
+          provider.eventDetail.eventTitle = provider.event?.title ?? "";
           provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
           provider.loginInfo.setLoginState(false);
           provider.loginInfo.setLogoutState(true);

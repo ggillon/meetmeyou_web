@@ -20,6 +20,7 @@ import 'contact.dart' as contactLib;
 import 'event.dart' as eventLib;
 import 'event_answer.dart' as answerLib;
 import 'photo_album.dart' as albumLib;
+import 'date_option.dart' as dateLib;
 import 'package:meetmeyou_web/services/storage/storage.dart' as storageLib;
 
 
@@ -83,6 +84,19 @@ abstract class MMYEngine {
   ///
  /// Get event parameter
   Future<dynamic> getEventParam(String eid, {required String param, });
+
+
+  /// Get all dates options from an event (in date start order)
+  Future<List<DateOption>> getDateOptionsFromEvent(String eid);
+  /// Answer a date attendance for an event
+  Future<Event> answerDateOption(String eid, String did, bool attend);
+  /// Answer dates attendance for an event
+  Future<Event> answerDatesOption(String eid, List<String> DIDs, bool attend);
+  /// Get status of dateOption for an event date
+  Future<bool> dateOptionStatus(String eid, String did);
+  /// Get list of dates selected
+  Future<List<String>> listDateSelected(String eid);
+
 }
 
 class MMY implements MMYEngine {
@@ -200,6 +214,39 @@ class MMY implements MMYEngine {
   @override
   Future<dynamic> getEventParam(String eid, {required String param}) async {
     return await eventLib.getParam(_currentUser, eid, param);
+  }
+
+  @override
+  Future<Event> answerDateOption(String eid, String did, bool attend) async {
+    await dateLib.answerDateOption(_currentUser, eid, did, attend);
+    return await dateLib.updateEventStatus(_currentUser, eid,);
+  }
+
+  @override
+  Future<Event> answerDatesOption(String eid, List<String> DIDs, bool attend) async {
+    List<DateOption> dates = await getDateOptionsFromEvent(eid);
+    for(String did in DIDs)
+      await dateLib.answerDateOption(_currentUser, eid, did, attend);
+    for(DateOption date in dates) {
+      if(!DIDs.contains(date.did))
+        await dateLib.answerDateOption(_currentUser, eid, date.did, !attend);
+    }
+    return await dateLib.updateEventStatus(_currentUser, eid,);
+  }
+
+  @override
+  Future<bool> dateOptionStatus(String eid, String did) async {
+    return dateLib.dateOptionStatus(_currentUser, eid, did);
+  }
+
+  @override
+  Future<List<String>> listDateSelected(String eid) async {
+    return dateLib.listDateSelected(_currentUser, eid);
+  }
+
+  @override
+  Future<List<DateOption>> getDateOptionsFromEvent(String eid) async {
+    return dateLib.getDateOptionsFromEvent(_currentUser, eid);
   }
 }
 

@@ -33,43 +33,69 @@ class EditProfileScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
   EditProfileProvider provider = locator<EditProfileProvider>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BaseView<EditProfileProvider>(
         onModelReady: (provider) async {
           this.provider = provider;
-          firstNameController.text = SharedPreference.prefs!.getString(SharedPreference.firstName) ?? "";
-          lastNameController.text = SharedPreference.prefs!.getString(SharedPreference.lastName) ?? "";
-          provider.countryCode = SharedPreference.prefs!.getString(SharedPreference.countryCode) ?? "";
-          phoneController.text = SharedPreference.prefs!.getString(SharedPreference.phone) ?? "";
-          emailController.text = SharedPreference.prefs!.getString(SharedPreference.email) ?? "";
-          addressController.text = SharedPreference.prefs!.getString(SharedPreference.address) ?? "";
+          firstNameController.text =
+              SharedPreference.prefs!.getString(SharedPreference.firstName) ??
+                  "";
+          lastNameController.text =
+              SharedPreference.prefs!.getString(SharedPreference.lastName) ??
+                  "";
+          provider.countryCode =
+              SharedPreference.prefs!.getString(SharedPreference.countryCode) ??
+                  "";
+          phoneController.text =
+              SharedPreference.prefs!.getString(SharedPreference.phone) ?? "";
+          emailController.text =
+              SharedPreference.prefs!.getString(SharedPreference.email) ?? "";
+          addressController.text =
+              SharedPreference.prefs!.getString(SharedPreference.address) ?? "";
           provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
         },
-        builder: (context, provider, _){
+        builder: (context, provider, _) {
           return Form(
             key: _formKey,
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  commonAppBar(context, true, routeName: RouteConstants.viewProfileScreen, userName: SharedPreference.prefs!.getString(SharedPreference.displayName) ?? "",),
+                  commonAppBar(
+                    context,
+                    true,
+                    routeName: RouteConstants.viewProfileScreen,
+                    userName: SharedPreference.prefs!
+                            .getString(SharedPreference.displayName) ??
+                        "",
+                  ),
                   SizedBox(height: DimensionConstants.d20.h),
                   Padding(
-                    padding: MediaQuery.of(context).size.width > 1050 ? EdgeInsets.symmetric(horizontal: DimensionConstants.d50.w) :  EdgeInsets.symmetric(horizontal: DimensionConstants.d20.w),
+                    padding: MediaQuery.of(context).size.width > 1050
+                        ? EdgeInsets.symmetric(
+                            horizontal: DimensionConstants.d50.w)
+                        : EdgeInsets.symmetric(
+                            horizontal: DimensionConstants.d20.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         GestureDetector(
-                          onTap: (){
-                            provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+                          onTap: () {
+                            provider.loginInfo =
+                                Provider.of<LoginInfo>(context, listen: false);
                             provider.loginInfo.setLoginState(true);
                             context.go(RouteConstants.eventDetailScreen);
                           },
                           child: Align(
                             alignment: Alignment.centerLeft,
-                            child: Text("${"go_to_event".tr()} >>").mediumText(Colors.blue, DimensionConstants.d14.sp, TextAlign.left, underline: true),
+                            child: Text("${"go_to_event".tr()} >>").mediumText(
+                                Colors.blue,
+                                DimensionConstants.d14.sp,
+                                TextAlign.left,
+                                underline: true),
                           ),
                         ),
                         SizedBox(height: DimensionConstants.d10.h),
@@ -77,41 +103,52 @@ class EditProfileScreen extends StatelessWidget {
                           width: DimensionConstants.d110,
                           height: DimensionConstants.d120,
                           child: ClipRRect(
-                              borderRadius: BorderRadius.circular(DimensionConstants.d12.r),
-                              child: (SharedPreference.prefs!.getString(SharedPreference.profileUrl) == null || SharedPreference.prefs!.getString(SharedPreference.profileUrl) == "")
-                                  ? Container(
-                                color: ColorConstants.primaryColor,
-                                width: DimensionConstants.d110,
-                                height: DimensionConstants.d120,
+                            borderRadius:
+                                BorderRadius.circular(DimensionConstants.d12.r),
+                            child: (SharedPreference.prefs!.getString(
+                                            SharedPreference.profileUrl) ==
+                                        null ||
+                                    SharedPreference.prefs!.getString(
+                                            SharedPreference.profileUrl) ==
+                                        "")
+                                ? Container(
+                                    color: ColorConstants.primaryColor,
+                                    width: DimensionConstants.d110,
+                                    height: DimensionConstants.d120,
+                                  )
+                                : ImageView(
+                                    path: SharedPreference.prefs!
+                                        .getString(SharedPreference.profileUrl),
+                                    width: DimensionConstants.d110,
+                                    height: DimensionConstants.d120,
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
+                        ),
+                        SizedBox(height: DimensionConstants.d20.h),
+                        MediaQuery.of(context).size.width > 600
+                            ? profileRowTextFields()
+                            : profileColumnTextFields(),
+                        SizedBox(height: DimensionConstants.d20.h),
+                        MediaQuery.of(context).size.width < 600
+                            ? Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: DimensionConstants.d12.w),
+                                child: provider.state == ViewState.Busy
+                                    ? const Align(
+                                        alignment: Alignment.center,
+                                        child: CircularProgressIndicator())
+                                    : Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: saveBtn(context)),
                               )
-                                  : ImageView(
-                                path: SharedPreference.prefs!.getString(SharedPreference.profileUrl),
-                                width: DimensionConstants.d110,
-                                height: DimensionConstants.d120,
-                                fit: BoxFit.cover,
-                              ),
-
-                          ),
-                        ),
-                        SizedBox(height: DimensionConstants.d20.h),
-                        MediaQuery.of(context).size.width > 600 ?  profileRowTextFields() : profileColumnTextFields(),
-                        SizedBox(height: DimensionConstants.d20.h),
-                        MediaQuery.of(context).size.width < 600 ? Padding(
-                          padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d12.w),
-                          child: provider.state == ViewState.Busy ? const Align(
-                              alignment: Alignment.center,
-                              child: CircularProgressIndicator()
-                          ) :  Align(
-                              alignment: Alignment.centerLeft,
-                              child: saveBtn(context)
-                          ),
-                        ) :  provider.state == ViewState.Busy ? const Align(
-                            alignment: Alignment.center,
-                            child: CircularProgressIndicator()
-                        ) :  Align(
-                            alignment: Alignment.centerLeft,
-                            child: saveBtn(context)
-                        ),
+                            : provider.state == ViewState.Busy
+                                ? const Align(
+                                    alignment: Alignment.center,
+                                    child: CircularProgressIndicator())
+                                : Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: saveBtn(context)),
                         SizedBox(height: DimensionConstants.d20.h),
                       ],
                     ),
@@ -125,29 +162,41 @@ class EditProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget commonAppBar(BuildContext context, bool navigate, {String? routeName, String? userName}){
+  Widget commonAppBar(BuildContext context, bool navigate,
+      {String? routeName, String? userName}) {
     return Card(
         margin: EdgeInsets.zero,
         child: Container(
-            padding: EdgeInsets.symmetric(vertical: DimensionConstants.d18.h, horizontal: DimensionConstants.d10.w),
+            padding: EdgeInsets.symmetric(
+                vertical: DimensionConstants.d18.h,
+                horizontal: DimensionConstants.d10.w),
             width: double.infinity,
             height: DimensionConstants.d75.h,
             alignment: Alignment.centerLeft,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                MediaQuery.of(context).size.width > 500 ?  Container(width: DimensionConstants.d80.w,
-                    alignment: Alignment.centerLeft,
-                    child: ImageView(path: ImageConstants.webLogo, width: DimensionConstants.d80.w,)) :
-            GestureDetector(
-                onTap: () async {},
-                child: ImageView(path: ImageConstants.mobileLogo, width: DimensionConstants.d80.w,)),
+                MediaQuery.of(context).size.width > 500
+                    ? Container(
+                        width: DimensionConstants.d80.w,
+                        alignment: Alignment.centerLeft,
+                        child: ImageView(
+                          path: ImageConstants.webLogo,
+                          width: DimensionConstants.d80.w,
+                        ))
+                    : GestureDetector(
+                        onTap: () async {},
+                        child: ImageView(
+                          path: ImageConstants.mobileLogo,
+                          width: DimensionConstants.d80.w,
+                        )),
                 Expanded(
                   child: Container(
                     alignment: Alignment.center,
-                    child:  Text(userName == null ? "Welcome" : "Welcome $userName")
-                        .semiBoldText(ColorConstants.colorBlack,
-                        DimensionConstants.d16.sp, TextAlign.left),
+                    child:
+                        Text(userName == null ? "Welcome" : "Welcome $userName")
+                            .semiBoldText(ColorConstants.colorBlack,
+                                DimensionConstants.d16.sp, TextAlign.left),
                   ),
                 ),
                 Container(
@@ -158,48 +207,53 @@ class EditProfileScreen extends StatelessWidget {
                       // PopupMenuItem 1
                       PopupMenuItem(
                         value: 1,
-                        child: Text("view_edit_profile".tr())
-                            .mediumText(ColorConstants.primaryColor,
-                            DimensionConstants.d14.sp, TextAlign.left),
+                        child: Text("view_edit_profile".tr()).mediumText(
+                            ColorConstants.primaryColor,
+                            DimensionConstants.d14.sp,
+                            TextAlign.left),
                       ),
                       // PopupMenuItem 2
                       PopupMenuItem(
                         value: 2,
-                        child:  Text("logout".tr())
-                            .mediumText(ColorConstants.colorBlack,
-                            DimensionConstants.d14.sp, TextAlign.left),
+                        child: Text("logout".tr()).mediumText(
+                            ColorConstants.colorBlack,
+                            DimensionConstants.d14.sp,
+                            TextAlign.left),
                       ),
                     ],
                     offset: Offset(0, 50),
                     color: Colors.white,
                     elevation: 2,
-                    icon: Icon(Icons.menu, color: ColorConstants.primaryColor, size: 30),
+                    icon: Icon(Icons.menu,
+                        color: ColorConstants.primaryColor, size: 30),
                     onSelected: (value) {
                       if (value == 1) {
-                        if(navigate){
-                          provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+                        if (navigate) {
+                          provider.loginInfo =
+                              Provider.of<LoginInfo>(context, listen: false);
                           provider.loginInfo.setLoginState(false);
                           context.go(routeName!);
                           provider.updateLoadingStatus(true);
                         }
                       } else if (value == 2) {
                         //    provider.isDisposed = false;
-                        provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+                        provider.loginInfo =
+                            Provider.of<LoginInfo>(context, listen: false);
                         provider.loginInfo.setLoginState(false);
                         provider.loginInfo.setLogoutState(true);
                         provider.updateLoadingStatus(true);
-                        context.go("${RouteConstants.loginInvitedScreen}?eid=${provider.eventId}");
+                        context.go(
+                            "${RouteConstants.loginInvitedScreen}?eid=${provider.eventId}");
                         provider.updateLoadingStatus(true);
                       }
                     },
                   ),
                 ),
               ],
-            ))
-    );
+            )));
   }
 
-  Widget profileRowTextFields(){
+  Widget profileRowTextFields() {
     return Column(
       children: [
         Row(
@@ -233,12 +287,13 @@ class EditProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget rowTextFieldContainer(String txt, Widget textField){
+  Widget rowTextFieldContainer(String txt, Widget textField) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(txt).boldText(ColorConstants.colorBlack, DimensionConstants.d15.sp, TextAlign.left),
+          Text(txt).boldText(ColorConstants.colorBlack,
+              DimensionConstants.d15.sp, TextAlign.left),
           SizedBox(height: DimensionConstants.d5.h),
           textField
         ],
@@ -246,7 +301,7 @@ class EditProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget profileColumnTextFields(){
+  Widget profileColumnTextFields() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d12.w),
       child: Column(
@@ -268,23 +323,26 @@ class EditProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget columnTextFieldContainer(String txt, Widget textField){
+  Widget columnTextFieldContainer(String txt, Widget textField) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(txt).boldText(ColorConstants.colorBlack, DimensionConstants.d15.sp, TextAlign.left),
+        Text(txt).boldText(ColorConstants.colorBlack, DimensionConstants.d15.sp,
+            TextAlign.left),
         SizedBox(height: DimensionConstants.d5.h),
         textField
       ],
     );
   }
 
-
-  Widget firstNameTextField(){
+  Widget firstNameTextField() {
     return TextFormField(
-      controller: firstNameController..text = SharedPreference.prefs!.getString(SharedPreference.firstName) ?? "",
+      controller: firstNameController
+        ..text =
+            SharedPreference.prefs!.getString(SharedPreference.firstName) ?? "",
       decoration: ViewDecoration.inputDecorationWithCurve("first_name".tr()),
-      style: ViewDecoration.textFieldStyle(DimensionConstants.d15.sp, ColorConstants.colorBlack),
+      style: ViewDecoration.textFieldStyle(
+          DimensionConstants.d15.sp, ColorConstants.colorBlack),
       keyboardType: TextInputType.name,
       textInputAction: TextInputAction.next,
       validator: (value) {
@@ -298,11 +356,14 @@ class EditProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget lastNameTextField(){
+  Widget lastNameTextField() {
     return TextFormField(
-      controller: lastNameController..text = SharedPreference.prefs!.getString(SharedPreference.lastName) ?? "",
+      controller: lastNameController
+        ..text =
+            SharedPreference.prefs!.getString(SharedPreference.lastName) ?? "",
       decoration: ViewDecoration.inputDecorationWithCurve("last_name".tr()),
-      style: ViewDecoration.textFieldStyle(DimensionConstants.d15.sp, ColorConstants.colorBlack),
+      style: ViewDecoration.textFieldStyle(
+          DimensionConstants.d15.sp, ColorConstants.colorBlack),
       keyboardType: TextInputType.name,
       textInputAction: TextInputAction.next,
       validator: (value) {
@@ -316,30 +377,31 @@ class EditProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget countryCodeTextField(){
+  Widget countryCodeTextField() {
     return TextFormField(
       readOnly: true,
       controller: countryCodeController,
-      decoration: ViewDecoration.inputDecorationWithCurve("", prefix: countryCodePicker()),
-      style: ViewDecoration.textFieldStyle(DimensionConstants.d15.sp, ColorConstants.colorBlack),
+      decoration: ViewDecoration.inputDecorationWithCurve("",
+          prefix: countryCodePicker()),
+      style: ViewDecoration.textFieldStyle(
+          DimensionConstants.d15.sp, ColorConstants.colorBlack),
       keyboardType: TextInputType.name,
       textInputAction: TextInputAction.next,
     );
   }
 
-  Widget countryCodePicker(){
-    return  CountryCodePicker(
+  Widget countryCodePicker() {
+    return CountryCodePicker(
       onChanged: (value) {
         provider.countryCode = value.dialCode.toString();
       },
-      textStyle:
-      ViewDecoration.textFieldStyle(
-          DimensionConstants.d14.sp,
-          ColorConstants.colorBlack),
+      textStyle: ViewDecoration.textFieldStyle(
+          DimensionConstants.d14.sp, ColorConstants.colorBlack),
       initialSelection:
-      (SharedPreference.prefs!.getString(SharedPreference.countryCode) == null)
-          ? "US"
-          :  SharedPreference.prefs!.getString(SharedPreference.countryCode),
+          (SharedPreference.prefs!.getString(SharedPreference.countryCode) ==
+                  null)
+              ? "US"
+              : SharedPreference.prefs!.getString(SharedPreference.countryCode),
       //  favorite: ['US', 'GB', 'BE', 'FR', 'LU', 'AN', '+49'],
       showFlag: false,
       showFlagDialog: true,
@@ -348,39 +410,44 @@ class EditProfileScreen extends StatelessWidget {
       alignLeft: false,
     );
   }
-  Widget phoneNoTextField(){
+
+  Widget phoneNoTextField() {
     return TextFormField(
       inputFormatters: <TextInputFormatter>[
         FilteringTextInputFormatter.digitsOnly,
       ],
-      controller: phoneController..text = SharedPreference.prefs!.getString(SharedPreference.phone) ?? "",
+      controller: phoneController
+        ..text =
+            SharedPreference.prefs!.getString(SharedPreference.phone) ?? "",
       decoration: ViewDecoration.inputDecorationWithCurve("phone_no".tr()),
-      style: ViewDecoration.textFieldStyle(DimensionConstants.d15.sp, ColorConstants.colorBlack),
+      style: ViewDecoration.textFieldStyle(
+          DimensionConstants.d15.sp, ColorConstants.colorBlack),
       keyboardType: TextInputType.phone,
       textInputAction: TextInputAction.next,
       validator: (value) {
         if (value!.trim().isEmpty) {
           return "phone_no_cannot_empty".tr();
-        }
-        else {
+        } else {
           return null;
         }
       },
     );
   }
 
-  Widget emailTextField(){
+  Widget emailTextField() {
     return TextFormField(
-      controller: emailController..text = SharedPreference.prefs!.getString(SharedPreference.email) ?? "",
+      controller: emailController
+        ..text =
+            SharedPreference.prefs!.getString(SharedPreference.email) ?? "",
       decoration: ViewDecoration.inputDecorationWithCurve("email".tr()),
-      style: ViewDecoration.textFieldStyle(DimensionConstants.d15.sp, ColorConstants.colorBlack),
+      style: ViewDecoration.textFieldStyle(
+          DimensionConstants.d15.sp, ColorConstants.colorBlack),
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       validator: (value) {
         if (value!.trim().isEmpty) {
           return "email_required".tr();
-        } else if (!Validations.emailValidation(
-            value.trim())) {
+        } else if (!Validations.emailValidation(value.trim())) {
           return "invalid_email".tr();
         } else {
           return null;
@@ -389,11 +456,14 @@ class EditProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget addressTextField(){
+  Widget addressTextField() {
     return TextFormField(
-      controller: addressController..text = SharedPreference.prefs!.getString(SharedPreference.address) ?? "",
+      controller: addressController
+        ..text =
+            SharedPreference.prefs!.getString(SharedPreference.address) ?? "",
       decoration: ViewDecoration.inputDecorationWithCurve("address".tr()),
-      style: ViewDecoration.textFieldStyle(DimensionConstants.d15.sp, ColorConstants.colorBlack),
+      style: ViewDecoration.textFieldStyle(
+          DimensionConstants.d15.sp, ColorConstants.colorBlack),
       keyboardType: TextInputType.streetAddress,
       textInputAction: TextInputAction.done,
     );
@@ -401,17 +471,25 @@ class EditProfileScreen extends StatelessWidget {
 
   Widget saveBtn(BuildContext context) {
     return GestureDetector(
-        onTap: (){
-          if(_formKey.currentState!.validate()){
+        onTap: () {
+          if (_formKey.currentState!.validate()) {
             provider.loginInfo.setLoginState(false);
-            provider.setUserProfile(context, firstNameController.text, lastNameController.text, provider.userDetail.profileUrl.toString(), emailController.text,
-                phoneController.text, addressController.text, provider.countryCode == null ?  (SharedPreference.prefs!.getString(SharedPreference.countryCode) ?? "") : provider.countryCode.toString()).then((value){
-                  if(value == true){
-                    context.go(RouteConstants.viewProfileScreen);
-                  }
+            provider
+                .updateProfile(
+                    context,
+                    firstNameController.text.trim(),
+                    lastNameController.text.trim(),
+                    provider.countryCode == null
+                        ? (SharedPreference.prefs!
+                                .getString(SharedPreference.countryCode) ??
+                            "")
+                        : provider.countryCode.toString(),
+                    phoneController.text.trim(),
+                    emailController.text.trim(),
+                    addressController.text.trim())
+                .then((value) {
+              context.go(RouteConstants.viewProfileScreen);
             });
-            // provider.updateProfile(context, firstNameController.text, lastNameController.text,
-            //     provider.countryCode.toString(), phoneController.text, emailController.text, addressController.text);
           }
         },
         child: Container(
@@ -419,12 +497,10 @@ class EditProfileScreen extends StatelessWidget {
           height: DimensionConstants.d40,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              borderRadius:BorderRadius.circular(DimensionConstants.d4.r),
-              color: ColorConstants.primaryColor
-          ),
-          child: Text("save".tr())
-              .mediumText(ColorConstants.colorWhite, DimensionConstants.d13.sp, TextAlign.center),
-        )
-    );
+              borderRadius: BorderRadius.circular(DimensionConstants.d4.r),
+              color: ColorConstants.primaryColor),
+          child: Text("save".tr()).mediumText(ColorConstants.colorWhite,
+              DimensionConstants.d13.sp, TextAlign.center),
+        ));
   }
 }

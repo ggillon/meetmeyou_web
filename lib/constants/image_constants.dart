@@ -20,4 +20,8 @@ class ImageConstants {
   static const dataAndPrivacy = "images/data_and_privacy.jpg";
   static const dataDeletion = "images/data_deletion.jpg";
   static const mobileLogo = "images/meetMeYou_mobile_logo.png";
+  static const contact_arrow_icon = "images/ic_contactArrow.svg";
+  static const small_logo_icon = "images/ic_smallLogo.svg";
+  static const small_add_icon = "images/ic_small_add.svg";
+  static const invited_waiting_icon = "images/ic_moreIcon.svg";
  }

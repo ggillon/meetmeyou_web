@@ -11,9 +11,15 @@ class SharedPreference{
   static const String countryCode = "countryCode";
   static const String address = "address";
   static const String profileUrl = "profileUrl";
+  static const String eventGalleryPhotoUrl = "eventGalleryPhotoUrl";
 
   static const String isLogin = "isLogin";
   static const String isLogout = "isLogout";
+
+  // for event attending screen
+  static const String attendingProfileKeys = "attendingProfileKeys";
+  static const String nonAttendingProfileKeys = "nonAttendingProfileKeys";
+  static const String invitedProfileKeys = "invitedProfileKeys";
 
   static SharedPreferences? prefs;
 }

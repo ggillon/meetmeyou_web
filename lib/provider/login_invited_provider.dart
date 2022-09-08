@@ -5,13 +5,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meetmeyou_web/constants/route_constants.dart';
-import 'package:meetmeyou_web/dialog_helper.dart';
+import 'package:meetmeyou_web/helper/dialog_helper.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/helper/common_widgets.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
 import 'package:meetmeyou_web/api_models/get_event_response.dart';
 import 'package:meetmeyou_web/main.dart';
+import 'package:meetmeyou_web/models/event.dart';
 import 'package:meetmeyou_web/models/user_detail.dart';
 import 'package:meetmeyou_web/provider/base_provider.dart';
 import 'package:meetmeyou_web/services/api.dart';
@@ -23,8 +24,7 @@ import '../services/fetch_data_exception.dart';
 import 'dart:io';
 
 class LoginInvitedProvider extends BaseProvider{
-MMYEngine? mmyEngine;
-
+  MMYEngine? mmyEngine;
 GetEventResponse? eventResponse;
 
  LoginInfo loginInfo = LoginInfo();

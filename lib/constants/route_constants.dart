@@ -6,4 +6,5 @@ class RouteConstants{
   static const String homePage = "/homePage";
   static const String eventGalleryPage = "/eventGalleryPage";
   static const String eventAttendingScreen = "/eventAttendingScreen";
+  static const String eventGalleryPhotoViewPage = "/eventGalleryPhotoViewPage";
 }

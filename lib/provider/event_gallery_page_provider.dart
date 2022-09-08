@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:meetmeyou_web/dialog_helper.dart';
+import 'package:meetmeyou_web/helper/dialog_helper.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';

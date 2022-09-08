@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:meetmeyou_web/dialog_helper.dart';
+import 'package:meetmeyou_web/helper/dialog_helper.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
+import 'package:meetmeyou_web/main.dart';
 import 'package:meetmeyou_web/models/contact.dart';
 import 'package:meetmeyou_web/provider/base_provider.dart';
 import 'package:meetmeyou_web/services/mmy/mmy.dart';
@@ -10,6 +11,8 @@ import 'package:meetmeyou_web/services/mmy/mmy.dart';
 class EventAttendingProvider extends BaseProvider{
   MMYEngine? mmyEngine;
   final eventId = SharedPreference.prefs!.getString(SharedPreference.eventId);
+
+  LoginInfo loginInfo = LoginInfo();
 
   List<Contact> eventAttendingLists = [];
   List<Contact> eventNotAttendingLists = [];

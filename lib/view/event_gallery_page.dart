@@ -6,7 +6,7 @@ import 'package:meetmeyou_web/constants/color_constants.dart';
 import 'package:meetmeyou_web/constants/dimension_constants.dart';
 import 'package:meetmeyou_web/constants/image_constants.dart';
 import 'package:meetmeyou_web/constants/route_constants.dart';
-import 'package:meetmeyou_web/dialog_helper.dart';
+import 'package:meetmeyou_web/helper/dialog_helper.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/extensions/all_extensions.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
@@ -116,6 +116,9 @@ class EventGalleryPage extends StatelessWidget {
 
             return GestureDetector(
                 onTap: (){
+                //  provider.eventDetail.eventGalleryPhotoUrl = provider.mmyPhotoList[index].photoURL;
+                  SharedPreference.prefs!.setString(SharedPreference.eventGalleryPhotoUrl, provider.mmyPhotoList[index].photoURL);
+                  context.go(RouteConstants.eventGalleryPhotoViewPage);
                   // Navigator.pushNamed(context, RoutesConstants.eventGalleryImageView, arguments: provider.mmyPhotoList[index]).then((value) {
                   //   provider.getPhotoAlbum(_scaffoldKey.currentContext!, provider.eventDetail.eid.toString());
                   // });

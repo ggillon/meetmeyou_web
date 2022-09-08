@@ -4,11 +4,12 @@ import 'package:meetmeyou_web/api_models/get_multi_dates_response.dart';
 import 'package:meetmeyou_web/api_models/set_questionaire_response.dart';
 import 'package:meetmeyou_web/constants/api_constants.dart';
 import 'package:meetmeyou_web/constants/color_constants.dart';
-import 'package:meetmeyou_web/dialog_helper.dart';
+import 'package:meetmeyou_web/helper/dialog_helper.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
 import 'package:meetmeyou_web/main.dart';
+import 'package:meetmeyou_web/models/date_option.dart';
 import 'package:meetmeyou_web/models/event.dart';
 import 'package:meetmeyou_web/api_models/get_event_response.dart';
 import 'package:meetmeyou_web/models/user_detail.dart';
@@ -21,14 +22,15 @@ class EventDetailProvider extends BaseProvider {
   final userUid = SharedPreference.prefs!.getString(SharedPreference.userId);
   final eventId = SharedPreference.prefs!.getString(SharedPreference.eventId);
   MMYEngine? mmyEngine;
-//  Event? eventResponse;
-  GetEventResponse? eventResponse;
+  Event? event;
+ // GetEventResponse? eventResponse;
   InvitedContacts? invitedContacts;
-  QuestionForm? questionForm;
+  //QuestionForm? questionForm;
   List<String> questionnaireKeysList = [];
-  List<String> questionnaireValuesList = [];
-  List<String> questionsList = [];
-  Answers? answers;
+  //List<String> questionnaireValuesList = [];
+  Map? eventAnswer;
+  //List<String> questionsList = [];
+  //Answers? answers;
   bool multipleDates = false;
 
   String respondBtnStatus = '';
@@ -37,297 +39,286 @@ class EventDetailProvider extends BaseProvider {
 
   LoginInfo loginInfo = LoginInfo();
 
-  Future<bool> getEvent(BuildContext context, String eid) async{
+  Future getEvent(BuildContext context, String eid) async {
     setState(ViewState.Busy);
-    try{
-      var model = await api.getEvent(eid);
-      if(model != null){
-        eventResponse = model;
-        multipleDates = model.multipleDates ?? false;
-        if(model.invitedContacts != null){
-          invitedContacts = model.invitedContacts;
-          respondBtnStatus =  getEventBtnStatus(invitedContacts!.keysList, invitedContacts!.valuesList);
-          respondBtnColor = getEventBtnColorStatus(invitedContacts!.keysList, invitedContacts!.valuesList, textColor: false);
-          respondBtnTextColor = getEventBtnColorStatus(invitedContacts!.keysList, invitedContacts!.valuesList);
-        }
-        if(model.form != null){
-          questionsList = [];
-          questionnaireKeysList = model.form!.keysList;
-          questionnaireValuesList = model.form!.valuesList;
 
-          for(int i = 0 ; i < questionnaireKeysList.length ; i++){
-            if(questionnaireKeysList[i] == "1. text"){
-              questionsList.add(questionnaireValuesList[i]);
-            }
-          }
-          for(int i = 0 ; i < questionnaireKeysList.length ; i++){
-            if(questionnaireKeysList[i] == "2. text"){
-              questionsList.add(questionnaireValuesList[i]);
-            }
-          }
-          for(int i = 0 ; i < questionnaireKeysList.length ; i++){
-            if(questionnaireKeysList[i] == "3. text"){
-              questionsList.add(questionnaireValuesList[i]);
-            }
-          }
-          for(int i = 0 ; i < questionnaireKeysList.length ; i++){
-            if(questionnaireKeysList[i] == "4. text"){
-              questionsList.add(questionnaireValuesList[i]);
-            }
-          }
-          for(int i = 0 ; i < questionnaireKeysList.length ; i++){
-            if(questionnaireKeysList[i] == "5. text"){
-              questionsList.add(questionnaireValuesList[i]);
-            }
-          }
-        }
-      }
-      setState(ViewState.Idle);
-      return true;
-    } on FetchDataException catch (c) {
+    mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
+
+    var value = await mmyEngine!.getEvent(eid).catchError((e) {
       setState(ViewState.Idle);
       DialogHelper.showMessage(context, "error".tr());
-      return false;
-    } on SocketException catch (c) {
+    });
+
+    if (value != null) {
+      event = value;
+      eventDetail.event = value;
+      respondBtnStatus = getEventBtnStatus(event!, auth.currentUser!.uid);
+      respondBtnTextColor = getEventBtnColorStatus(
+          event!, auth.currentUser!.uid);
+     respondBtnColor = getEventBtnColorStatus(
+          event!, auth.currentUser!.uid,
+          textColor: false);
+
+     /// getting ques.
+      if (event!.form.isNotEmpty) {
+        for (var key in event!.form.keys) {
+          questionnaireKeysList.add(key);
+        }
+      }
+
+      multipleDates = value.multipleDates;
+
+      getProfileStatusKeys(event!);
+
       setState(ViewState.Idle);
-      DialogHelper.showMessage(context, 'internet_connection'.tr());
-      return false;
+    } else{
+      event = null;
+      setState(ViewState.Idle);
     }
   }
-
-  // Future getEvent(BuildContext context, String eid) async {
-  //   setState(ViewState.Busy);
-  //
-  //   mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
-  //
-  //   var value = await mmyEngine!.getEvent(eid).catchError((e) {
-  //     setState(ViewState.Idle);
-  //     DialogHelper.showMessage(context, "error".tr());
-  //   });
-  //
-  //   if (value != null) {
-  //     eventResponse = value;
-  //     setState(ViewState.Idle);
-  //   }
-  // }
 
   /// Reply to event
 
-  Future<bool> replyToEvent(BuildContext context, String apiType) async{
+  Future replyToEvent(BuildContext context, String eid, String response) async {
     setState(ViewState.Busy);
-    try{
-      await api.replyToEvent(userUid.toString(), eventId.toString(), apiType);
-      await getEvent(context, eventId.toString());
-      setState(ViewState.Idle);
-      return true;
-    } on FetchDataException catch (c) {
+
+    mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
+
+    await mmyEngine!.replyToEvent(eid, response: response).catchError((e) {
       setState(ViewState.Idle);
       DialogHelper.showMessage(context, "error".tr());
-      return false;
-    } on SocketException catch (c) {
-      setState(ViewState.Idle);
-      DialogHelper.showMessage(context, 'internet_connection'.tr());
-      return false;
-    }
-  }
+    });
 
-  // Future replyToEvent(BuildContext context, String eid, String response) async {
-  //   setState(ViewState.Busy);
-  //
-  //   mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
-  //
-  //   await mmyEngine!.replyToEvent(eid, response: response).catchError((e) {
-  //     setState(ViewState.Idle);
-  //     DialogHelper.showMessage(context, "error".tr());
-  //   });
-  //
-  //   setState(ViewState.Idle);
-  //   Navigator.of(context).pop();
-  // }
+    await getEvent(context, eventId.toString());
+    setState(ViewState.Idle);
+
+  }
 
   /// Reply to Questionnaire Form
 
-  Future<bool> answerToQuestionnaireForm(BuildContext context, String answer1, String answer2, String answer3,
-      String answer4, String answer5) async{
+  Future answersToEventQuestionnaire(
+      BuildContext context, String eid, Map answers) async {
     setState(ViewState.Busy);
-    try{
-      await api.answerToQuestionnaireForm(userUid.toString(), eventId.toString(), answer1, answer2, answer3, answer4, answer5);
-      await replyToEvent(context, ApiConstants.attendEvent);
+
+    await mmyEngine!.answerEventForm(eid, answers: answers).catchError((e) {
       setState(ViewState.Idle);
-      return true;
-    } on FetchDataException catch (c) {
-      setState(ViewState.Idle);
-      DialogHelper.showMessage(context, "error".tr());
-      return false;
-    } on SocketException catch (c) {
-      setState(ViewState.Idle);
-      DialogHelper.showMessage(context, 'internet_connection'.tr());
-      return false;
-    }
+      DialogHelper.showMessage(context, e.message);
+    });
+
+    await replyToEvent(context, eid, EVENT_ATTENDING);
+    setState(ViewState.Idle);
   }
 
 
-  Future<bool> getAnswersQuestionnaireForm(BuildContext context) async{
+  Future getAnswerEventForm(BuildContext context, String eid, String uid) async{
     setState(ViewState.Busy);
-    try{
-    var value =  await api.getAnswersQuestionnaireForm(userUid.toString(), eventId.toString());
+    mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
+    var value =  await mmyEngine!.getAnswerEventForm(eid, uid).catchError((e){
+      setState(ViewState.Idle);
+       DialogHelper.showMessage(context, "error".tr());
+    });
+
     if(value != null){
-      answers = value.answers;
+      eventAnswer = value.answers;
+      setState(ViewState.Idle);
     }
-      setState(ViewState.Idle);
-      return true;
-    } on FetchDataException catch (c) {
-      setState(ViewState.Idle);
-      DialogHelper.showMessage(context, "error".tr());
-      return false;
-    } on SocketException catch (c) {
-      setState(ViewState.Idle);
-      DialogHelper.showMessage(context, 'internet_connection'.tr());
-      return false;
-    }
-  }
 
+  }
   /// multi dates
 
-  List<GetMultiDates> multiDates = [];
-  List<String> allDateDidList = [];
-  List<String> didAttendedDate = [];
+  // Multi date~~~~~~~~~~~~~~~
 
-  Future<bool> getMultiDates(BuildContext context, {bool multiAns = false}) async{
-    multiAns ? updateAnswerMultiDate(true) : setState(ViewState.Busy);
-    try{
-      var value =  await api.getMultiDates(eventId.toString());
-      if(value != null){
-        multiDates = value.multiDates;
-        multiDates.sort((a,b) {
-          return a.start!.compareTo(b.start!);
-        });
-        for(var element in multiDates){
-          allDateDidList.add(element.did.toString());
-        }
+  List<String> multiDateDidsList = [];
+  // this list used for attend = false
+  List<String> didsOfMultiDateSelected = [];
 
-        for(var element in multiDates){
-          var currentDateStatus = getEventBtnStatus(element.invitedContacts!.keysList, element.invitedContacts!.valuesList);
-          if(currentDateStatus == "going"){
-            didAttendedDate.add(element.did.toString());
-          }
-        }
-      }
-      multiAns ? updateAnswerMultiDate(false) :  setState(ViewState.Idle);
-      return true;
-    } on FetchDataException catch (c) {
-      multiAns ? updateAnswerMultiDate(false) :  setState(ViewState.Idle);
-      DialogHelper.showMessage(context, "error".tr());
-      return false;
-    } on SocketException catch (c) {
-      multiAns ? updateAnswerMultiDate(false) :  setState(ViewState.Idle);
-      DialogHelper.showMessage(context, 'internet_connection'.tr());
-      return false;
-    }
-  }
+  List<DateOption> multipleDate = [];
 
-  bool answerMultiDate = false;
+  bool getMultipleDate = false;
 
-   updateAnswerMultiDate(bool val){
-    answerMultiDate = val;
+  void updateGetMultipleDate(bool value) {
+    getMultipleDate = value;
     notifyListeners();
   }
 
-  int selectedMultiDateIndex = -1;
+  Future getMultipleDateOptionsFromEvent(BuildContext context, String eid) async {
+    setState(ViewState.Busy);
+    mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
+    // onBtnClick ? Navigator.of(context).pop() : Container();
+    var value = await mmyEngine!.getDateOptionsFromEvent(eid).catchError((e) {
+      setState(ViewState.Idle);
+      DialogHelper.showMessage(context, e.message);
+    });
 
-  List<String> didsOfMultiDateSelected = [];
-
-  Future<bool> attendMultiDate(BuildContext context, List<String> dids) async{
-    updateAnswerMultiDate(true);
-    try{
-      await api.attendMultiDate(userUid.toString(), eventId.toString(), dids);
-      didsOfMultiDateSelected = [];
-      await getMultiDates(context, multiAns: true);
-     // updateAnswerMultiDate(false);
-      return true;
-    } on FetchDataException catch (c) {
-      updateAnswerMultiDate(false);
-      DialogHelper.showMessage(context, "error".tr());
-      return false;
-    } on SocketException catch (c) {
-      updateAnswerMultiDate(false);
-      DialogHelper.showMessage(context, 'internet_connection'.tr());
-      return false;
+    if (value != null) {
+      multipleDate = value;
+      await listOfDateSelected(context, eid);
+      setState(ViewState.Idle);
     }
   }
 
-  Future<bool> unAttendMultiDate(BuildContext context, List<String> dids) async{
-    updateAnswerMultiDate(true);
-    try{
-      await api.unAttendMultiDate(userUid.toString(), eventId.toString(), dids);
-      await getMultiDates(context, multiAns: true);
-      return true;
-    } on FetchDataException catch (c) {
-      updateAnswerMultiDate(false);
-      DialogHelper.showMessage(context, "error".tr());
-      return false;
-    } on SocketException catch (c) {
-      updateAnswerMultiDate(false);
-      DialogHelper.showMessage(context, 'internet_connection'.tr());
-      return false;
+  bool statusMultiDate = false;
+
+  updateStatusMultiDate(bool value) {
+    statusMultiDate = value;
+    notifyListeners();
+  }
+
+  Future listOfDateSelected(BuildContext context, String eid, {bool onBtnClick = true}) async {
+
+    mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
+
+    var value = await mmyEngine!.listDateSelected(eid).catchError((e) {
+      setState(ViewState.Idle);
+      DialogHelper.showMessage(context, e.message);
+    });
+
+    if (value != null) {
+      multiDateDidsList = value;
+      setState(ViewState.Idle);
     }
   }
 
+  int selectedMultiDateIndex = 0;
 
-  getEventBtnStatus(List<String> keysList, List<String> valuesList) {
-      for (int i = 0; i < keysList.length; i++) {
-          if (keysList[i] == userUid) {
-            if (valuesList[i] == "Invited") {
-              return "respond";
-            } else if (valuesList[i] == "Organiser") {
-              return "edit";
-            } else if (valuesList[i] == "Attending") {
-              return "going";
-            } else if (valuesList[i] == "Not Attending") {
-              return "not_going";
-            } else if (valuesList[i] == "Not Interested") {
-              return "hidden";
-            } else if (valuesList[i] == "Canceled") {
-              return "cancelled";
-            }
-          }
+  bool answerMultiDate = false;
+
+  updateMultiDate(bool value) {
+    answerMultiDate = value;
+    notifyListeners();
+  }
+
+  Future answerMultiDateOption(
+      BuildContext context, List<String> did, bool attend) async {
+    updateMultiDate(true);
+    mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
+
+    await mmyEngine!.answerDatesOption(eventId.toString(), did, attend).catchError((e) {
+      updateMultiDate(false);
+      DialogHelper.showMessage(context, e.message);
+    });
+
+    updateMultiDate(false);
+  }
+
+  /// get user profile~~~~~~~~
+  Future<void> getUserProfile(BuildContext context) async {
+    setState(ViewState.Busy);
+
+    mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
+    var profileResponse = await mmyEngine!.getUserProfile().catchError((e) {
+      setState(ViewState.Idle);
+      DialogHelper.showMessage(context, e.message);
+    });
+
+    if(profileResponse != null){
+      SharedPreference.prefs!.setString(SharedPreference.displayName, profileResponse.displayName.toString());
+    }
+    setState(ViewState.Idle);
+  }
+
+  /// setting response btn status
+  ///
+   getEventBtnStatus(Event event, String userCid) {
+    List<String> keysList = [];
+    for (var key in event.invitedContacts.keys) {
+      keysList.add(key);
+    }
+    List<String> valuesList = [];
+    for (var value in event.invitedContacts.values) {
+      valuesList.add(value);
+    }
+    for (int i = 0; i < keysList.length; i++) {
+      if (keysList[i] == userCid) {
+        if (valuesList[i] == "Invited") {
+          return "respond";
+        } else if (valuesList[i] == "Organiser") {
+          return "edit";
+        } else if (valuesList[i] == "Attending") {
+          return "going";
+        } else if (valuesList[i] == "Not Attending") {
+          return "not_going";
+        } else if (valuesList[i] == "Not Interested") {
+          return "hidden";
+        } else if (valuesList[i] == "Canceled") {
+          return "cancelled";
+        }
       }
-      return "respond";
+    }
+    return "";
   }
 
-   getEventBtnColorStatus(List<String> keysList, List<String> valuesList, {bool textColor = true}) {
-       for (int i = 0; i < keysList.length; i++) {
-         if (keysList[i] == userUid) {
-           if (valuesList[i] == "Invited") {
-             return textColor
-                 ? ColorConstants.colorWhite
-                 : ColorConstants.primaryColor;
-           } else if (valuesList[i] == "Organiser") {
-             return textColor
-                 ? ColorConstants.colorWhite
-                 : ColorConstants.primaryColor;
-           } else if (valuesList[i] == "Attending") {
-             return textColor
-                 ? ColorConstants.primaryColor
-                 : ColorConstants.primaryColor.withOpacity(0.2);
-           } else if (valuesList[i] == "Not Attending") {
-             return textColor
-                 ? ColorConstants.primaryColor
-                 : ColorConstants.primaryColor.withOpacity(0.2);
-           } else if (valuesList[i] == "Not Interested") {
-             return textColor
-                 ? ColorConstants.primaryColor
-                 : ColorConstants.primaryColor.withOpacity(0.2);
-           } else if (valuesList[i] == "Canceled") {
-             return textColor
-                 ? ColorConstants.primaryColor
-                 : ColorConstants.primaryColor.withOpacity(0.2);
-           }
-         }
-       }
-       return textColor
-           ? ColorConstants.colorWhite
-           : ColorConstants.primaryColor;
+   getEventBtnColorStatus(Event event, String userCid,{bool textColor = true}) {
+    List<String> keysList = [];
+    for (var key in event.invitedContacts.keys) {
+      keysList.add(key);
+    }
+    List<String> valuesList = [];
+    for (var value in event.invitedContacts.values) {
+      valuesList.add(value);
+    }
+    for (int i = 0; i < keysList.length; i++) {
+      if (keysList[i] == userCid) {
+        if (valuesList[i] == "Invited") {
+          return textColor
+              ? ColorConstants.colorWhite
+              : ColorConstants.primaryColor;
+        } else if (valuesList[i] == "Organiser") {
+          return textColor
+              ? ColorConstants.colorWhite
+              : ColorConstants.primaryColor;
+        } else if (valuesList[i] == "Attending") {
+          return textColor
+              ? ColorConstants.primaryColor
+              : ColorConstants.primaryColor.withOpacity(0.2);
+        } else if (valuesList[i] == "Not Attending") {
+          return textColor
+              ? ColorConstants.primaryColor
+              : ColorConstants.primaryColor.withOpacity(0.2);
+        } else if (valuesList[i] == "Not Interested") {
+          return textColor
+              ? ColorConstants.primaryColor
+              : ColorConstants.primaryColor.withOpacity(0.2);
+        } else if (valuesList[i] == "Canceled") {
+          return textColor
+              ? ColorConstants.primaryColor
+              : ColorConstants.primaryColor.withOpacity(0.2);
+        }
+      }
+    }
+    return textColor
+        ? ColorConstants.colorWhite
+        : ColorConstants.primaryColor;
+  }
 
+  /// getting attending, not-attending, invite keys~~~~~~~
+///
+  getProfileStatusKeys(Event event) {
+    eventDetail.attendingProfileKeys = [];
+    eventDetail.nonAttendingProfileKeys = [];
+    eventDetail.invitedProfileKeys = [];
+    List<String> keysList = [];
+    for (var key in event.invitedContacts.keys) {
+      keysList.add(key);
+    }
+    List<String> valuesList = [];
+    for (var value in event.invitedContacts.values) {
+      valuesList.add(value);
+    }
+    for (int i = 0; i < keysList.length; i++) {
+        if (valuesList[i] == "Invited") {
+          eventDetail.invitedProfileKeys.add(keysList[i]);
+        } else if (valuesList[i] == "Organiser") {
+          eventDetail.attendingProfileKeys.add(keysList[i]);
+        } else if (valuesList[i] == "Attending") {
+          eventDetail.attendingProfileKeys.add(keysList[i]);
+        } else if (valuesList[i] == "Not Attending") {
+          eventDetail.nonAttendingProfileKeys.add(keysList[i]);
+        }
+    }
+    SharedPreference.prefs!.setStringList(SharedPreference.attendingProfileKeys, eventDetail.attendingProfileKeys);
+    SharedPreference.prefs!.setStringList(SharedPreference.nonAttendingProfileKeys, eventDetail.nonAttendingProfileKeys);
+    SharedPreference.prefs!.setStringList(SharedPreference.invitedProfileKeys, eventDetail.invitedProfileKeys);
+    return "";
   }
 }

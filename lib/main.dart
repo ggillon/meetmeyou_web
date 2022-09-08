@@ -18,6 +18,7 @@ import 'package:meetmeyou_web/view/edit_profile_screen.dart';
 import 'package:meetmeyou_web/view/event_attending_screen.dart';
 import 'package:meetmeyou_web/view/event_detail_screen.dart';
 import 'package:meetmeyou_web/view/event_gallery_page.dart';
+import 'package:meetmeyou_web/view/event_gallery_photo_view_page.dart';
 import 'package:meetmeyou_web/view/home_page.dart';
 import 'package:meetmeyou_web/view/login_invited_screen.dart';
 import 'package:meetmeyou_web/view/view_profile_screen.dart';
@@ -119,6 +120,12 @@ class MyApp extends StatelessWidget {
         path: RouteConstants.eventAttendingScreen,
         builder: (BuildContext context, GoRouterState state) {
           return EventAttendingScreen();
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.eventGalleryPhotoViewPage,
+        builder: (BuildContext context, GoRouterState state) {
+          return EventGalleryPhotoViewPage();
         },
       ),
       // GoRoute(

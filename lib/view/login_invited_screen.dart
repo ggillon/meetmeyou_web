@@ -226,9 +226,9 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
               DimensionConstants.d12.sp, TextAlign.center),
           SizedBox(height: DimensionConstants.d10.h),
           socialMediaLoginBtn(
-              "sign_up_with_google".tr(), ImageConstants.ic_google, onTap: () {
+              "sign_up_with_google".tr(), ImageConstants.ic_google, onTap: () async {
           //  SharedPreference.prefs!.setString(SharedPreference.userId, "ZKsRCGO51CWRh4NslebxT3ZsEBY2");
-            provider.login(context);
+           await provider.login(context);
             provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
             provider.loginInfo.setLoginState(true);
             provider.loginInfo.setLogoutState(false);
