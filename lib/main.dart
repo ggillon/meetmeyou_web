@@ -156,15 +156,20 @@ class MyApp extends StatelessWidget {
        // }
 
        final isLoggedOut = _loginInfo.logoutState;
-       final isOnEventDetail = state.location == RouteConstants.eventDetailScreen;
-       final isOnViewProfile = state.location == RouteConstants.viewProfileScreen;
-       final isOnEditProfile = state.location == RouteConstants.editProfileScreen;
+       // final isOnEventDetail = state.location == RouteConstants.eventDetailScreen;
+       // final isOnViewProfile = state.location == RouteConstants.viewProfileScreen;
+       // final isOnEditProfile = state.location == RouteConstants.editProfileScreen;
+       // final isOnGalleryPage = state.location == RouteConstants.eventGalleryPage;
+       // final isOnGalleryView = state.location == RouteConstants.eventGalleryPhotoViewPage;
+       // final isOnCheckResponses = state.location == RouteConstants.eventAttendingScreen;
+
+      final isGoingToLogin = state.subloc == RouteConstants.loginInvitedScreen;
 
          if(isLoggedOut) {
          //  _loginInfo.setLoginState(false);
-           return (isOnEventDetail || isOnViewProfile || isOnEditProfile) ? "${RouteConstants.loginInvitedScreen}?eid=${loc[1]}" : null;
+         //  return (isOnEventDetail || isOnViewProfile || isOnEditProfile || isOnGalleryPage || isOnGalleryView || isOnCheckResponses) ?
+           return isGoingToLogin ? null : "${RouteConstants.loginInvitedScreen}?eid=${loc.length == 2 ? loc[1] : (SharedPreference.prefs?.getString(SharedPreference.eventId) ?? "null")}";
          }
-
 
 
       // no need to redirect at all

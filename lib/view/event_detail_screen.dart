@@ -64,6 +64,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       onModelReady: (provider) async {
         this.provider = provider;
         provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+      //  provider.loginInfo.setLogoutState(true);
         await provider.getEvent(context, provider.eventId.toString()).then((value) async {
           await provider.getUserProfile(context);
         });
@@ -88,6 +89,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           await provider.getMultipleDateOptionsFromEvent(context, provider.eventId.toString());
         }
 
+        if(!provider.isUserRespondsToEvent){
+          (provider.eventDetail.organiserId == provider.auth.currentUser!.uid.toString() ? Container() :
+          await provider.inviteUrl(context, provider.eventId.toString()));
+        }
       },
       builder: (context, provider, _) {
         return provider.state == ViewState.Busy
@@ -532,7 +537,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       GestureDetector(
                           onTap: () {
                             if (_formKey.currentState!.validate()) {
-                             final Map<String, dynamic> answersMap = {};
+                             final Map<String, dynamic> answersMap = <String, dynamic>{};
                               for(int i = 0; i < provider.questionnaireKeysList.length; i++){
                                 if(i == 0){
                                   answersMap.addAll({
@@ -611,7 +616,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           provider.eventDetail.eventTitle = provider.event?.title ?? "";
           provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
           provider.loginInfo.setLoginState(false);
-          provider.loginInfo.setLogoutState(true);
+          provider.loginInfo.setLogoutState(false);
           provider.updateLoadingStatus(true);
           context.go(RouteConstants.eventGalleryPage);
         },
@@ -653,9 +658,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         onTap: () {
           provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
           provider.loginInfo.setLoginState(false);
-          provider.loginInfo.setLogoutState(true);
+          provider.loginInfo.setLogoutState(false);
           provider.updateLoadingStatus(true);
           context.go(RouteConstants.eventAttendingScreen);
+          provider.updateLoadingStatus(true);
         },
         child: Card(
           shape: RoundedRectangleBorder(

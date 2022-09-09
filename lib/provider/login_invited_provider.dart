@@ -149,7 +149,7 @@ Future<void> signInWithApple(BuildContext context) async {
     var value = await mmyEngine!.isNew();
     if (value) {
       var userProfile = await mmyEngine!.createUserProfile();
-      await mmyEngine!.appleFirstSignIn();
+     // await mmyEngine!.appleFirstSignIn();
       print(userProfile);
       updateData(false);
       SharedPreference.prefs!.setString(SharedPreference.userId, userProfile.uid.toString());

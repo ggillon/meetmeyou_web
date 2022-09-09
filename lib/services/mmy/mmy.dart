@@ -97,6 +97,11 @@ abstract class MMYEngine {
   /// Get list of dates selected
   Future<List<String>> listDateSelected(String eid);
 
+  /// Handle Link Event
+  Future<void>inviteURL(String eid);
+
+  /// Invite contact to event
+  Future<Event> inviteContactsToEvent(String eid, {required List<String> CIDs});
 }
 
 class MMY implements MMYEngine {
@@ -248,5 +253,19 @@ class MMY implements MMYEngine {
   Future<List<DateOption>> getDateOptionsFromEvent(String eid) async {
     return dateLib.getDateOptionsFromEvent(_currentUser, eid);
   }
+
+  @override
+  Future<void>inviteURL(String eid) async {
+    Event event = await eventLib.getEvent(_currentUser, eid);
+    await contactLib.linkProfiles(_currentUser, uid: event.organiserID); // ensure both user and organiser are friends
+    await inviteContactsToEvent(eid, CIDs: [_currentUser.uid]);
+  }
+
+  @override
+  Future<Event> inviteContactsToEvent(String eid, {required List<String> CIDs}) async {
+    return await eventLib.updateInvitations(_currentUser, eid,
+        eventLib.Invitations(CIDs: CIDs, inviteStatus: EVENT_INVITED));
+  }
+
 }
 

@@ -72,7 +72,7 @@
   "check_event_responses" : "Check event responses",
   "photo_gallery" : "Photo Gallery",
   "attending" : "Attending",
-  "non_attending" : "Non-Attending",
+  "not_attending" : "Not-Attending",
   "invited" : "Invited",
   "fetching_gallery" : "Fetching gallery",
   "no_photos_yet" : "No photos yet......",

@@ -55,15 +55,15 @@ class EventAttendingProvider extends BaseProvider{
         eventInvitedLists.add(value);
       }
     }
-    var value = await mmyEngine!
-        .getContactFromProfile(eventDetail.organiserId.toString())
-        .catchError((e) async {
-      setState(ViewState.Idle);
-      DialogHelper.showMessage(context, e.message);
-    });
-    if (value != null) {
-      eventAttendingLists.add(value);
-    }
+    // var value = await mmyEngine!
+    //     .getContactFromProfile(eventDetail.organiserId.toString())
+    //     .catchError((e) async {
+    //   setState(ViewState.Idle);
+    //   DialogHelper.showMessage(context, e.message);
+    // });
+    // if (value != null) {
+    //   eventAttendingLists.add(value);
+    // }
     setState(ViewState.Idle);
   }
 

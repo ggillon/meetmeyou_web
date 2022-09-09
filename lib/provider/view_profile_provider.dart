@@ -74,7 +74,7 @@ class ViewProfileProvider extends BaseProvider{
       SharedPreference.prefs!.setString(SharedPreference.email, profileResponse.email.toString());
       SharedPreference.prefs!.setString(SharedPreference.phone, profileResponse.phoneNumber.toString());
       SharedPreference.prefs!.setString(SharedPreference.countryCode, profileResponse.countryCode.toString());
-      SharedPreference.prefs!.setString(SharedPreference.address, profileResponse.addresses['Home']) ?? "";
+      SharedPreference.prefs!.setString(SharedPreference.address, profileResponse.addresses['Home'] ?? "");
       SharedPreference.prefs!.setString(SharedPreference.profileUrl, profileResponse.photoURL.toString());
       userDetail.firstName = profileResponse.firstName;
       userDetail.lastName = profileResponse.lastName;

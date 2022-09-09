@@ -32,6 +32,7 @@ class EventDetailProvider extends BaseProvider {
   //List<String> questionsList = [];
   //Answers? answers;
   bool multipleDates = false;
+  bool isUserRespondsToEvent = false;
 
   String respondBtnStatus = '';
   Color respondBtnColor = ColorConstants.primaryColor;
@@ -52,6 +53,7 @@ class EventDetailProvider extends BaseProvider {
     if (value != null) {
       event = value;
       eventDetail.event = value;
+      eventDetail.organiserId = value.organiserID;
       respondBtnStatus = getEventBtnStatus(event!, auth.currentUser!.uid);
       respondBtnTextColor = getEventBtnColorStatus(
           event!, auth.currentUser!.uid);
@@ -99,6 +101,8 @@ class EventDetailProvider extends BaseProvider {
   Future answersToEventQuestionnaire(
       BuildContext context, String eid, Map answers) async {
     setState(ViewState.Busy);
+
+    mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
 
     await mmyEngine!.answerEventForm(eid, answers: answers).catchError((e) {
       setState(ViewState.Idle);
@@ -235,17 +239,21 @@ class EventDetailProvider extends BaseProvider {
         } else if (valuesList[i] == "Organiser") {
           return "edit";
         } else if (valuesList[i] == "Attending") {
+          isUserRespondsToEvent = true;
           return "going";
         } else if (valuesList[i] == "Not Attending") {
+          isUserRespondsToEvent = true;
           return "not_going";
         } else if (valuesList[i] == "Not Interested") {
+          isUserRespondsToEvent = true;
           return "hidden";
         } else if (valuesList[i] == "Canceled") {
+          isUserRespondsToEvent = true;
           return "cancelled";
         }
       }
     }
-    return "";
+    return "respond";
   }
 
    getEventBtnColorStatus(Event event, String userCid,{bool textColor = true}) {
@@ -321,4 +329,18 @@ class EventDetailProvider extends BaseProvider {
     SharedPreference.prefs!.setStringList(SharedPreference.invitedProfileKeys, eventDetail.invitedProfileKeys);
     return "";
   }
+
+/// invite to event!!!~~~~~~
+  Future inviteUrl(BuildContext context, var eid) async {
+   updateData(true);
+
+    mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
+
+    await mmyEngine!.inviteURL(eid).catchError((e) {
+      updateData(false);
+    });
+
+   updateData(false);
+  }
+
 }
