@@ -21,6 +21,7 @@ import 'package:meetmeyou_web/view/event_gallery_page.dart';
 import 'package:meetmeyou_web/view/event_gallery_photo_view_page.dart';
 import 'package:meetmeyou_web/view/home_page.dart';
 import 'package:meetmeyou_web/view/login_invited_screen.dart';
+import 'package:meetmeyou_web/view/video_player.dart' as video_player;
 import 'package:meetmeyou_web/view/view_profile_screen.dart';
 import 'package:meetmeyou_web/widgets/error_screen.dart';
 import 'package:meetmeyou_web/widgets/splash_screen.dart';
@@ -126,6 +127,12 @@ class MyApp extends StatelessWidget {
         path: RouteConstants.eventGalleryPhotoViewPage,
         builder: (BuildContext context, GoRouterState state) {
           return EventGalleryPhotoViewPage();
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.videoPlayer,
+        builder: (BuildContext context, GoRouterState state) {
+          return video_player.VideoPlayer();
         },
       ),
       // GoRoute(

@@ -1,4 +1,9 @@
+import 'package:video_player/video_player.dart';
+
 import 'constants.dart';
+
+const PHOTO_TYPE_PHOTO = "Photo";
+const PHOTO_TYPE_VIDEO = "Video";
 
 class MMYPhoto {
   MMYPhoto(
@@ -11,6 +16,7 @@ class MMYPhoto {
         this.folder = '',
         required this.photoURL,
         required this.timeStamp,
+        this.type = PHOTO_TYPE_PHOTO,
         this.other = EMPTY_MAP,
       });
 
@@ -22,7 +28,9 @@ class MMYPhoto {
   String folder;
   String photoURL;
   DateTime timeStamp;
+  String type;
   Map other;
+  VideoPlayerController? videoPlayerController;
 
   factory MMYPhoto.fromMap(Map<String, dynamic> data) {
     final int timeMillisec = data['timeStamp'];
@@ -35,6 +43,7 @@ class MMYPhoto {
       description: data['description'],
       folder: data['folder'],
       photoURL: data['photoURL'],
+      type: data['type'],
       timeStamp: DateTime.fromMillisecondsSinceEpoch(timeMillisec),
       other: data['other'],
     );
@@ -51,6 +60,7 @@ class MMYPhoto {
       description: data['description'],
       folder: data['folder'],
       photoURL: data['photoURL'],
+      type: data['type'],
       timeStamp: DateTime.fromMillisecondsSinceEpoch(timeMillisec),
       other: data['other'],
     );
@@ -65,6 +75,7 @@ class MMYPhoto {
       'description': description,
       'folder': folder,
       'photoURL': photoURL,
+      'type': type,
       'timeStamp': timeStamp.millisecondsSinceEpoch,
       'other': other,
     };

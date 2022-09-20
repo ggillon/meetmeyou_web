@@ -12,6 +12,7 @@ class SharedPreference{
   static const String address = "address";
   static const String profileUrl = "profileUrl";
   static const String eventGalleryPhotoUrl = "eventGalleryPhotoUrl";
+  static const String eventGalleryVideoUrl = "eventGalleryVideoUrl";
 
   static const String isLogin = "isLogin";
   static const String isLogout = "isLogout";

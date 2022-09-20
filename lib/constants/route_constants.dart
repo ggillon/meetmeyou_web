@@ -7,4 +7,5 @@ class RouteConstants{
   static const String eventGalleryPage = "/eventGalleryPage";
   static const String eventAttendingScreen = "/eventAttendingScreen";
   static const String eventGalleryPhotoViewPage = "/eventGalleryPhotoViewPage";
+  static const String videoPlayer = "/videoPlayer";
 }

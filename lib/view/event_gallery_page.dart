@@ -11,10 +11,12 @@ import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/extensions/all_extensions.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/main.dart';
+import 'package:meetmeyou_web/models/photo.dart';
 import 'package:meetmeyou_web/provider/event_gallery_page_provider.dart';
 import 'package:meetmeyou_web/view/base_view.dart';
 import 'package:meetmeyou_web/widgets/image_view.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 class EventGalleryPage extends StatelessWidget {
   EventGalleryPage({Key? key}) : super(key: key);
@@ -78,7 +80,7 @@ class EventGalleryPage extends StatelessWidget {
                               DimensionConstants.d16.sp,
                               TextAlign.left, maxLines: 2, overflow: TextOverflow.ellipsis),
                         SizedBox(height: DimensionConstants.d2.h),
-                      provider.galleryImagesUrl.isEmpty ? Center(
+                      provider.photoGalleryData.isEmpty ? Center(
                         child: Container(
                           alignment: Alignment.center,
                           height: DimensionConstants.d600,
@@ -106,7 +108,7 @@ class EventGalleryPage extends StatelessWidget {
         height: DimensionConstants.d650,
         child: GridView.builder(
         //  physics: const NeverScrollableScrollPhysics(),
-          itemCount: provider.galleryImagesUrl.length,
+          itemCount: provider.photoGalleryData.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               crossAxisSpacing: 4.0,
@@ -114,16 +116,35 @@ class EventGalleryPage extends StatelessWidget {
           ),
           itemBuilder: (BuildContext context, int index){
 
-            return GestureDetector(
+            return (provider.mmyPhotoList[index].type == PHOTO_TYPE_VIDEO ?
+            Container(
+              color: ColorConstants.primaryColor,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  VideoPlayer(provider.photoGalleryData[index].videoPlayerController!),
+                  GestureDetector(
+                    onTap: (){
+                      SharedPreference.prefs!.setString(SharedPreference.eventGalleryVideoUrl, provider.photoGalleryData[index].photoUrl.toString());
+                      context.go(RouteConstants.videoPlayer);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: ColorConstants.colorWhitishGray,
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(DimensionConstants.d10),
+                      child: const Icon(Icons.play_arrow, size: 24, color: Colors.blueGrey,),
+                    ),
+                  )
+                ],
+              ),
+            ) : GestureDetector(
                 onTap: (){
-                //  provider.eventDetail.eventGalleryPhotoUrl = provider.mmyPhotoList[index].photoURL;
-                  SharedPreference.prefs!.setString(SharedPreference.eventGalleryPhotoUrl, provider.mmyPhotoList[index].photoURL);
+                  SharedPreference.prefs!.setString(SharedPreference.eventGalleryPhotoUrl, provider.photoGalleryData[index].photoUrl.toString());
                   context.go(RouteConstants.eventGalleryPhotoViewPage);
-                  // Navigator.pushNamed(context, RoutesConstants.eventGalleryImageView, arguments: provider.mmyPhotoList[index]).then((value) {
-                  //   provider.getPhotoAlbum(_scaffoldKey.currentContext!, provider.eventDetail.eid.toString());
-                  // });
                 },
-                child: Card(child: ImageView(path: provider.galleryImagesUrl[index], fit: BoxFit.cover,)));
+                child: Card(child: ImageView(path: provider.photoGalleryData[index].photoUrl, fit: BoxFit.cover,))));
           },
         ));
   }
