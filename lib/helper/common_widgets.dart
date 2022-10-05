@@ -343,11 +343,11 @@ class CommonWidgets{
              SizedBox(width: DimensionConstants.d8.w),
              profileCardNameAndEmailDesign(contactName, email,
                  search: true, searchStatus: searchStatus, isFavouriteContact: isFavouriteContact),
-             currentUser == true ? Container() : iconStatusCheck(
-                 searchStatus: search ? searchStatus : "",
-                 addIconTap: search ? addIconTapAction : () {},
-                 deleteIconTap: search ? deleteIconTapAction ?? () {} : () {}
-             )
+             // currentUser == true ? Container() : iconStatusCheck(
+             //     searchStatus: search ? searchStatus : "",
+             //     addIconTap: search ? addIconTapAction : () {},
+             //     deleteIconTap: search ? deleteIconTapAction ?? () {} : () {}
+             //)
            ],
          ),
        ),

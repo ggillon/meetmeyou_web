@@ -151,16 +151,21 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             ),
                             SizedBox(height: DimensionConstants.d85.h),
                            provider.multipleDates ? multiAttendDateUi(context, provider)
-                               : Align(
+                               : provider.respondBtnStatus == "" ? Container() : (Align(
                               alignment: Alignment.center,
-                              child: CommonWidgets.respondBtn(
+                              child: (provider.respondBtnStatus == "edit") ?  CommonWidgets.respondBtn(
+                                  context,
+                                  "organiser".tr(),
+                                  ColorConstants.colorNewGray,
+                                  ColorConstants.colorGray, onTapFun: () {},
+                                  width: MediaQuery.of(context).size.width/1.2) : CommonWidgets.respondBtn(
                                   context,
                                   provider.respondBtnStatus.tr(),
                                   provider.respondBtnColor,
                                   provider.respondBtnTextColor, onTapFun: () {
-                               ( provider.respondBtnStatus == "edit" || provider.respondBtnStatus == "") ? Container() : respondBtnDialog(context);
+                                  respondBtnDialog(context);
                               }, width: MediaQuery.of(context).size.width/1.2),
-                            ),
+                            )),
                             SizedBox(height: DimensionConstants.d15.h),
                             Text("event_description".tr()).boldText(
                                 ColorConstants.colorBlack,

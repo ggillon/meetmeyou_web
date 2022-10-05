@@ -64,6 +64,7 @@ class ViewProfileProvider extends BaseProvider{
     mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
     var profileResponse = await mmyEngine!.getUserProfile().catchError((e) {
       setState(ViewState.Idle);
+      print(e);
       DialogHelper.showMessage(context, e.message);
     });
 

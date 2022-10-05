@@ -25,35 +25,55 @@ import 'dart:io';
 
 class LoginInvitedProvider extends BaseProvider{
   MMYEngine? mmyEngine;
-GetEventResponse? eventResponse;
+//GetEventResponse? eventResponse;
 
  LoginInfo loginInfo = LoginInfo();
 
-Future<bool> getEvent(BuildContext context, String eid) async{
-  setState(ViewState.Busy);
-  try{
-    var model = await api.getEvent(eid);
-    if(model.eid != null){
-      eventResponse = model;
-      SharedPreference.prefs!.setString(SharedPreference.eventId, model.eid.toString());
-    } else{
-      eventResponse = null;
-    }
-    setState(ViewState.Idle);
-    return true;
-  } on FetchDataException catch (c) {
-    setState(ViewState.Idle);
-    eventResponse = null;
-    DialogHelper.showMessage(context, "error".tr());
-    return false;
-  } on SocketException catch (c) {
-    setState(ViewState.Idle);
-    eventResponse = null;
-    DialogHelper.showMessage(context, 'internet_connection'.tr());
-    return false;
-  }
-}
+// Future<bool> getEvent(BuildContext context, String eid) async{
+//   setState(ViewState.Busy);
+//   try{
+//     var model = await api.getEvent(eid);
+//     if(model.eid != null){
+//       eventResponse = model;
+//       SharedPreference.prefs!.setString(SharedPreference.eventId, model.eid.toString());
+//     } else{
+//       eventResponse = null;
+//     }
+//     setState(ViewState.Idle);
+//     return true;
+//   } on FetchDataException catch (c) {
+//     setState(ViewState.Idle);
+//     eventResponse = null;
+//     DialogHelper.showMessage(context, "error".tr());
+//     return false;
+//   } on SocketException catch (c) {
+//     setState(ViewState.Idle);
+//     eventResponse = null;
+//     DialogHelper.showMessage(context, 'internet_connection'.tr());
+//     return false;
+//   }
+// }
 
+  Event? eventResponse;
+
+  Future getEvent(BuildContext context, String eid) async {
+    setState(ViewState.Busy);
+
+    var value = await MMY.getWebEvent(eid).catchError((e) {
+      setState(ViewState.Idle);
+      DialogHelper.showMessage(context, "error".tr());
+    });
+
+    if (value != null) {
+      eventResponse = value;
+      SharedPreference.prefs!.setString(SharedPreference.eventId, value.eid.toString());
+      setState(ViewState.Idle);
+    }
+     else{
+      eventResponse = null;
+      setState(ViewState.Idle);
+    }
+  }
 bool startData = false;
 
 updateStartData(bool val){

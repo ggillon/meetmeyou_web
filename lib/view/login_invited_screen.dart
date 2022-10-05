@@ -152,11 +152,8 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
                                       child: CommonWidgets.titleDateLocationCard(
                                           context,
                                           provider.eventResponse?.title ?? "",
-                                          DateTime.fromMillisecondsSinceEpoch(
-                                              provider.eventResponse?.start ??
-                                                  ""),
-                                          DateTime.fromMillisecondsSinceEpoch(
-                                              provider.eventResponse?.end ?? ""),
+                                              provider.eventResponse!.start,
+                                          provider.eventResponse!.end,
                                           provider.eventResponse?.location ?? "",
                                           provider.eventResponse?.organiserName ??
                                               ""),
@@ -227,12 +224,12 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
           SizedBox(height: DimensionConstants.d10.h),
           socialMediaLoginBtn(
               "sign_up_with_google".tr(), ImageConstants.ic_google, onTap: () async {
-          //  SharedPreference.prefs!.setString(SharedPreference.userId, "ZKsRCGO51CWRh4NslebxT3ZsEBY2");
-          //  await provider.login(context);
-          //   provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
-          //   provider.loginInfo.setLoginState(true);
-          //   provider.loginInfo.setLogoutState(false);
-          //   context.go(RouteConstants.eventDetailScreen);
+           // SharedPreference.prefs!.setString(SharedPreference.userId, "ZKsRCGO51CWRh4NslebxT3ZsEBY2");
+           // await provider.login(context);
+           //  provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+           //  provider.loginInfo.setLoginState(true);
+           //  provider.loginInfo.setLogoutState(false);
+           //  context.go(RouteConstants.eventDetailScreen);
               provider.data == true
                   ? const Center(
                 child:

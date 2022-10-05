@@ -267,5 +267,11 @@ class MMY implements MMYEngine {
         eventLib.Invitations(CIDs: CIDs, inviteStatus: EVENT_INVITED));
   }
 
+
+  static Future<Event> getWebEvent(String eid) async {
+    User webUser = (await FirebaseAuth.instance.signInAnonymously()).user!;
+    return await eventLib.getEvent(webUser, eid);
+  }
+
 }
 
