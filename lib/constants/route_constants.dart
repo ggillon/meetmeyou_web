@@ -8,4 +8,5 @@ class RouteConstants{
   static const String eventAttendingScreen = "/eventAttendingScreen";
   static const String eventGalleryPhotoViewPage = "/eventGalleryPhotoViewPage";
   static const String videoPlayer = "/videoPlayer";
+  static const String eventAttendingMultiDateScreen = "/eventAttendingMultiDateScreen";
 }

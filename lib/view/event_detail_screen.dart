@@ -374,20 +374,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             ),
           ),
         ),
-        //     :
-        // Container(
-        //   margin: EdgeInsets.symmetric(horizontal: DimensionConstants.d5.h),
-        //   width: DimensionConstants.d440,
-        //   height: DimensionConstants.d125,
-        //   child: ListView.builder(
-        //       scrollDirection: Axis.horizontal,
-        //       physics: const AlwaysScrollableScrollPhysics(),
-        //       shrinkWrap: true,
-        //       itemCount: provider.multiDates.length,
-        //       itemBuilder: (context, index) {
-        //         return multiAttendDateCard(context, provider, index);
-        //       }),
-        // ),
         SizedBox(height: DimensionConstants.d5.h),
         submitMultiDateBtn(context, provider)
       ],
@@ -665,7 +651,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           provider.loginInfo.setLoginState(false);
           provider.loginInfo.setLogoutState(false);
           provider.updateLoadingStatus(true);
-          context.go(RouteConstants.eventAttendingScreen);
+          provider.event!.multipleDates == true ?  context.go(RouteConstants.eventAttendingMultiDateScreen)
+              : context.go(RouteConstants.eventAttendingScreen);
           provider.updateLoadingStatus(true);
         },
         child: Card(

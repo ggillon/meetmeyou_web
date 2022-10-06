@@ -15,6 +15,7 @@ import 'package:meetmeyou_web/provider/base_provider.dart';
 import 'package:meetmeyou_web/provider/login_invited_provider.dart';
 import 'package:meetmeyou_web/services/auth/auth.dart';
 import 'package:meetmeyou_web/view/edit_profile_screen.dart';
+import 'package:meetmeyou_web/view/event_attending_multi_date.dart';
 import 'package:meetmeyou_web/view/event_attending_screen.dart';
 import 'package:meetmeyou_web/view/event_detail_screen.dart';
 import 'package:meetmeyou_web/view/event_gallery_page.dart';
@@ -133,6 +134,12 @@ class MyApp extends StatelessWidget {
         path: RouteConstants.videoPlayer,
         builder: (BuildContext context, GoRouterState state) {
           return video_player.VideoPlayer();
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.eventAttendingMultiDateScreen,
+        builder: (BuildContext context, GoRouterState state) {
+          return EventAttendingMultiDateScreen();
         },
       ),
       // GoRoute(

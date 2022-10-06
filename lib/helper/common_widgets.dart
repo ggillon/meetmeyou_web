@@ -455,4 +455,36 @@ class CommonWidgets{
    }
  }
 
+
+ static Widget welcomeCommonAppBar(BuildContext context, {String? userName}){
+   return Card(
+       margin: EdgeInsets.zero,
+       child: Container(
+           padding: EdgeInsets.symmetric(vertical: DimensionConstants.d18.h, horizontal: DimensionConstants.d10.w),
+           width: double.infinity,
+           height: DimensionConstants.d75.h,
+           alignment: Alignment.centerLeft,
+           child: Row(
+             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+             children: [
+               MediaQuery.of(context).size.width > 500 ? Container(width: DimensionConstants.d80.w,
+                   alignment: Alignment.centerLeft,
+                   child: ImageView(path: ImageConstants.webLogo, width: DimensionConstants.d80.w,)) :
+               GestureDetector(
+                   onTap: () async {},
+                   child: ImageView(path: ImageConstants.mobileLogo, width: DimensionConstants.d80.w,)),
+               Expanded(
+                 child: Container(
+                   alignment: Alignment.center,
+                   child:  Text(userName == null ? "Welcome" : "Welcome $userName")
+                       .semiBoldText(ColorConstants.colorBlack,
+                       DimensionConstants.d16.sp, TextAlign.left),
+                 ),
+               ),
+               MediaQuery.of(context).size.width > 500 ? Container(width: DimensionConstants.d80.w) :
+               Container(width: DimensionConstants.d80.w),
+             ],
+           ))
+   );
+ }
 }
