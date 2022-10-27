@@ -206,6 +206,9 @@ class MyApp extends StatelessWidget {
           splitScreenMode: true,
           builder: (context, child) =>
          MaterialApp.router(
+           onGenerateTitle: (BuildContext context) {
+             return "MeetMeYou";
+           },
                 routeInformationProvider: _router.routeInformationProvider,
                 routeInformationParser: _router.routeInformationParser,
                 routerDelegate: _router.routerDelegate,
