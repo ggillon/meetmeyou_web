@@ -162,9 +162,9 @@ class Auth implements AuthBase {
 
   @override
   Future<void> signOut() async {
+    await _auth.signOut();
     await GoogleSignIn().signOut();
     await FacebookAuth.instance.logOut();
-    await _auth.signOut();
     /*final googleSignIn = GoogleSignIn();
     if (googleSignIn != null)
       await googleSignIn.signOut();

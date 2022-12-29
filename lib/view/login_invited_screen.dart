@@ -66,8 +66,13 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
             showFloatingBtn = true;
             provider.updateLoadingStatus(true);
           }
-           provider.loginInfo =  Provider.of<LoginInfo>(context, listen: false);
-           provider.loginInfo.onAppStart();
+          WidgetsBinding.instance.addPostFrameCallback((_){
+
+            provider.loginInfo =  Provider.of<LoginInfo>(context, listen: false);
+            provider.loginInfo.onAppStart();
+
+          });
+
           await provider.getEvent(context, widget.eid);
           //   provider.loginInfo.isDisposed = false;
           //  provider.loginInfo.updateLoadingStatus(true);

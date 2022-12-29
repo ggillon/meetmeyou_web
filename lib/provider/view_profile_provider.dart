@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meetmeyou_web/api_models/get_set_profile_response.dart';
+import 'package:meetmeyou_web/constants/route_constants.dart';
 import 'package:meetmeyou_web/helper/dialog_helper.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
@@ -64,8 +66,8 @@ class ViewProfileProvider extends BaseProvider{
     mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
     var profileResponse = await mmyEngine!.getUserProfile().catchError((e) {
       setState(ViewState.Idle);
-      print(e);
-      DialogHelper.showMessage(context, e.message);
+     // DialogHelper.showMessage(context, e.message);
+      context.go("${RouteConstants.loginInvitedScreen}?eid=${eventId}");
     });
 
     if(profileResponse != null){

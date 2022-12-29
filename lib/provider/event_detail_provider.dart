@@ -1,9 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meetmeyou_web/api_models/get_multi_dates_response.dart';
 import 'package:meetmeyou_web/api_models/set_questionaire_response.dart';
 import 'package:meetmeyou_web/constants/api_constants.dart';
 import 'package:meetmeyou_web/constants/color_constants.dart';
+import 'package:meetmeyou_web/constants/route_constants.dart';
 import 'package:meetmeyou_web/helper/dialog_helper.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
@@ -17,6 +19,7 @@ import 'package:meetmeyou_web/provider/base_provider.dart';
 import 'package:meetmeyou_web/services/mmy/mmy.dart';
 import '../services/fetch_data_exception.dart';
 import 'dart:io';
+import 'dart:html' as html;
 
 class EventDetailProvider extends BaseProvider {
   final userUid = SharedPreference.prefs!.getString(SharedPreference.userId);
@@ -53,6 +56,7 @@ class EventDetailProvider extends BaseProvider {
     if (value != null) {
       event = value;
       eventDetail.event = value;
+
       eventDetail.organiserId = value.organiserID;
       respondBtnStatus = getEventBtnStatus(event!, auth.currentUser!.uid);
       respondBtnTextColor = getEventBtnColorStatus(
@@ -212,7 +216,9 @@ class EventDetailProvider extends BaseProvider {
     mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
     var profileResponse = await mmyEngine!.getUserProfile().catchError((e) {
       setState(ViewState.Idle);
-      DialogHelper.showMessage(context, e.message);
+     // DialogHelper.showMessage(context, e.message);
+     // html.window.location.reload();
+      context.go("${RouteConstants.loginInvitedScreen}?eid=${eventId}");
     });
 
     if(profileResponse != null){

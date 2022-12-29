@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meetmeyou_web/constants/api_constants.dart';
@@ -64,6 +67,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       onModelReady: (provider) async {
         this.provider = provider;
         provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+      //  print(provider.auth.currentUser);
+        //print(provider.eventId.toString());
       //  provider.loginInfo.setLogoutState(true);
         await provider.getEvent(context, provider.eventId.toString()).then((value) async {
           await provider.getUserProfile(context);
@@ -281,7 +286,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     color: Colors.white,
                     elevation: 2,
                     icon: Icon(Icons.menu, color: ColorConstants.primaryColor, size: 30),
-                    onSelected: (value) {
+                    onSelected: (value) async {
                       if (value == 1) {
                         if(navigate){
                           provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
@@ -295,6 +300,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         provider.loginInfo.setLoginState(false);
                         provider.loginInfo.setLogoutState(true);
                         provider.updateLoadingStatus(true);
+                        // await FirebaseFirestore.instance.clearPersistence();
+                         await provider.auth.signOut();
                         context.go("${RouteConstants.loginInvitedScreen}?eid=${provider.eventId}");
                         provider.updateLoadingStatus(true);
                       }

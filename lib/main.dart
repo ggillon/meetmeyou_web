@@ -14,6 +14,7 @@ import 'package:meetmeyou_web/locator.dart';
 import 'package:meetmeyou_web/provider/base_provider.dart';
 import 'package:meetmeyou_web/provider/login_invited_provider.dart';
 import 'package:meetmeyou_web/services/auth/auth.dart';
+import 'package:meetmeyou_web/services/mmy/mmy.dart';
 import 'package:meetmeyou_web/view/edit_profile_screen.dart';
 import 'package:meetmeyou_web/view/event_attending_multi_date.dart';
 import 'package:meetmeyou_web/view/event_attending_screen.dart';
@@ -44,7 +45,7 @@ Future<void> main() async {
   );
   await EasyLocalization.ensureInitialized();
   // Disable persistence on web platforms
-  await FirebaseAuth.instance.setPersistence(Persistence.SESSION);
+  await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
   SharedPreference.prefs = await SharedPreferences.getInstance();
   setupLocator();
   // check if is running on Web
@@ -69,6 +70,8 @@ Future<void> main() async {
   ));
 
 }
+
+AuthBase auth = locator<AuthBase>();
 
 class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
@@ -152,6 +155,7 @@ class MyApp extends StatelessWidget {
       errorBuilder: (context, state) => ErrorScreen(state.error!),
     redirect: (GoRouterState state){
       var loc = state.location.toString().split("?eid=");
+      SharedPreference.prefs!.setString(SharedPreference.eventId, loc.length == 2 ? loc[1] : (SharedPreference.prefs?.getString(SharedPreference.eventId) ?? "null"));
       print(loc);
       // final loginLocation = state.namedLocation("login");
      //  final eventDetailLocation = state.namedLocation("eventDetailLocation");
@@ -162,6 +166,16 @@ class MyApp extends StatelessWidget {
        final isGoingToEventDetail = state.subloc == RouteConstants.eventDetailScreen;
 
        if(isLoggedIn){
+         // if(auth.currentUser != null){
+         //   if(auth.currentUser!.email == null){
+         //     return "${RouteConstants.loginInvitedScreen}?eid=${loc.length == 2 ? loc[1] : (SharedPreference.prefs?.getString(SharedPreference.eventId) ?? "null")}";
+         //   } else{
+         //     return isGoingToEventDetail ? null : RouteConstants.eventDetailScreen;
+         //   }
+         // } else{
+         //   return isGoingToEventDetail ? null : RouteConstants.eventDetailScreen;
+         // }
+
          return isGoingToEventDetail ? null : RouteConstants.eventDetailScreen;
        }
 
@@ -186,6 +200,7 @@ class MyApp extends StatelessWidget {
          }
 
 
+      // print(auth.currentUser);
       // no need to redirect at all
       return null;
 
@@ -254,7 +269,7 @@ class LoginInfo extends ChangeNotifier {
 
   Future<void> onAppStart() async {
     loginState = SharedPreference.prefs!.getBool(SharedPreference.isLogin) ?? false;
-    logoutState = SharedPreference.prefs!.getBool(SharedPreference.isLogout) ?? true;
+    logoutState = SharedPreference.prefs!.getBool(SharedPreference.isLogout) ?? false;
    // print(loginState);
     notifyListeners();
   }

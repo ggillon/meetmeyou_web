@@ -140,7 +140,7 @@ class ViewProfileScreen extends StatelessWidget {
                     color: Colors.white,
                     elevation: 2,
                     icon: Icon(Icons.menu, color: ColorConstants.primaryColor, size: 30),
-                    onSelected: (value) {
+                    onSelected: (value) async {
                       if (value == 1) {
                         if(navigate){
                           provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
@@ -153,6 +153,7 @@ class ViewProfileScreen extends StatelessWidget {
                         provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
                         provider.loginInfo.setLoginState(false);
                         provider.loginInfo.setLogoutState(true);
+                        await provider.auth.signOut();
                         context.go("${RouteConstants.loginInvitedScreen}?eid=${provider.eventId}");
                         provider.updateLoadingStatus(true);
                       }

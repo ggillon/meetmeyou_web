@@ -188,7 +188,7 @@ Future<void> signInWithApple(BuildContext context) async {
 
 Future<void> login(
     BuildContext context) async {
-  var user = await auth.signInEmailUser("d2@gmail.com", "Qwerty@123")
+  var user = await auth.signInEmailUser("db1@gmail.com", "Qwerty@123")
       .catchError((e) {
     setState(ViewState.Idle);
     DialogHelper.showMessage(context, e.message);

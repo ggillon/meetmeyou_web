@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meetmeyou_web/api_models/get_set_profile_response.dart';
+import 'package:meetmeyou_web/constants/route_constants.dart';
 import 'package:meetmeyou_web/helper/dialog_helper.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/helper/shared_pref.dart';
@@ -57,7 +59,8 @@ class EditProfileProvider extends BaseProvider{
     mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
     var userProfile = await mmyEngine!.updateProfile(firstName: firstName, lastName: lastName, countryCode: countryCode, phoneNumber: phoneNo, email: email, homeAddress: address).catchError((e) {
       setState(ViewState.Idle);
-      DialogHelper.showMessage(context, e.message);
+   //   DialogHelper.showMessage(context, e.message);
+      context.go("${RouteConstants.loginInvitedScreen}?eid=${eventId}");
     });
 
     if(userProfile != null){
