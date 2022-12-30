@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meetmeyou_web/constants/dimension_constants.dart';
 import 'package:meetmeyou_web/constants/route_constants.dart';
@@ -31,6 +32,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
+  setUrlStrategy(PathUrlStrategy());
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: const FirebaseOptions(
@@ -80,7 +82,8 @@ class MyApp extends StatelessWidget {
 
   late final GoRouter _router = GoRouter(
     // turn off the # in the URLs on the web
-    urlPathStrategy: UrlPathStrategy.path,
+    //urlPathStrategy: UrlPathStrategy.path,
+   // initialLocation:  RouteConstants.loginInvitedScreen,
     routes: <GoRoute>[
       GoRoute(
         path: "/",
@@ -153,7 +156,7 @@ class MyApp extends StatelessWidget {
       // ),
     ],
       errorBuilder: (context, state) => ErrorScreen(state.error!),
-    redirect: (GoRouterState state){
+    redirect: (context, GoRouterState state){
       var loc = state.location.toString().split("?eid=");
       SharedPreference.prefs!.setString(SharedPreference.eventId, loc.length == 2 ? loc[1] : (SharedPreference.prefs?.getString(SharedPreference.eventId) ?? "null"));
       print(loc);
@@ -183,6 +186,14 @@ class MyApp extends StatelessWidget {
        //  _loginInfo.loginState = true;
        // }
 
+      final isHomePage = state.subloc == "/";
+
+      if(loc.length == 2){
+        if(loc[1] == "null"){
+          return isHomePage ? null : "/";
+        }
+      }
+
        final isLoggedOut = _loginInfo.logoutState;
        // final isOnEventDetail = state.location == RouteConstants.eventDetailScreen;
        // final isOnViewProfile = state.location == RouteConstants.viewProfileScreen;
@@ -192,14 +203,22 @@ class MyApp extends StatelessWidget {
        // final isOnCheckResponses = state.location == RouteConstants.eventAttendingScreen;
 
       final isGoingToLogin = state.subloc == RouteConstants.loginInvitedScreen;
+      final isGoingToEditProfile = state.subloc == RouteConstants.editProfileScreen;
 
          if(isLoggedOut) {
          //  _loginInfo.setLoginState(false);
          //  return (isOnEventDetail || isOnViewProfile || isOnEditProfile || isOnGalleryPage || isOnGalleryView || isOnCheckResponses) ?
-           return isGoingToLogin ? null : "${RouteConstants.loginInvitedScreen}?eid=${loc.length == 2 ? loc[1] : (SharedPreference.prefs?.getString(SharedPreference.eventId) ?? "null")}";
+           return isGoingToLogin ? null :
+    //       (SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == true) ? RouteConstants.editProfileScreen :
+           "${RouteConstants.loginInvitedScreen}?eid=${loc.length == 2 ? loc[1] : (SharedPreference.prefs?.getString(SharedPreference.eventId) ?? "null")}";
          }
 
-
+        //  /// for new apple login.
+        // final isGoingToEditProfile = state.subloc == RouteConstants.editProfileScreen;
+        //
+        //  if(SharedPreference.prefs!.getBool(SharedPreference.isAppleUser) == true){
+        //    isGoingToEditProfile ? null : RouteConstants.editProfileScreen;
+        //  }
       // print(auth.currentUser);
       // no need to redirect at all
       return null;
@@ -221,12 +240,13 @@ class MyApp extends StatelessWidget {
           splitScreenMode: true,
           builder: (context, child) =>
          MaterialApp.router(
+           routerConfig: _router,
            onGenerateTitle: (BuildContext context) {
              return "MeetMeYou";
            },
-                routeInformationProvider: _router.routeInformationProvider,
-                routeInformationParser: _router.routeInformationParser,
-                routerDelegate: _router.routerDelegate,
+                // routeInformationProvider: _router.routeInformationProvider,
+                // routeInformationParser: _router.routeInformationParser,
+                // routerDelegate: _router.routerDelegate,
                 debugShowCheckedModeBanner: false,
                 title: StringConstants.appName,
                 localizationsDelegates: context.localizationDelegates,
@@ -269,7 +289,7 @@ class LoginInfo extends ChangeNotifier {
 
   Future<void> onAppStart() async {
     loginState = SharedPreference.prefs!.getBool(SharedPreference.isLogin) ?? false;
-    logoutState = SharedPreference.prefs!.getBool(SharedPreference.isLogout) ?? false;
+    logoutState = SharedPreference.prefs!.getBool(SharedPreference.isLogout) ?? true;
    // print(loginState);
     notifyListeners();
   }

@@ -241,6 +241,8 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
                 CircularProgressIndicator(),
               )
                   : provider.signInWithGoogle(context);
+           //  SharedPreference.prefs!.setBool(SharedPreference.checkAppleLoginFilledProfile, true);
+           //  context.go(RouteConstants.editProfileScreen);
           }),
           SizedBox(height: DimensionConstants.d10.h),
           socialMediaLoginBtn(
@@ -255,7 +257,7 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
           isIosPlatform ? SizedBox(height: DimensionConstants.d10.h) : Container(),
           isIosPlatform ? socialMediaLoginBtn(
               "sign_up_with_apple".tr(), ImageConstants.ic_apple, onTap: () {
-            //  context.go(RouteConstants.eventDetailScreen);
+             context.go(RouteConstants.eventDetailScreen);
             provider.data == true
                 ? const Center(
                     child: CircularProgressIndicator(),

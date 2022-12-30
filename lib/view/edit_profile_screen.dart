@@ -82,7 +82,8 @@ class EditProfileScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        GestureDetector(
+                        (SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == true) ? Container()
+                            :   GestureDetector(
                           onTap: () {
                             provider.loginInfo =
                                 Provider.of<LoginInfo>(context, listen: false);
@@ -199,7 +200,8 @@ class EditProfileScreen extends StatelessWidget {
                                 DimensionConstants.d16.sp, TextAlign.left),
                   ),
                 ),
-                Container(
+                (SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == true) ? Container()
+                 : Container(
                   width: DimensionConstants.d80.w,
                   alignment: Alignment.centerRight,
                   child: PopupMenuButton<int>(
@@ -242,7 +244,7 @@ class EditProfileScreen extends StatelessWidget {
                         provider.loginInfo.setLoginState(false);
                         provider.loginInfo.setLogoutState(true);
                         provider.updateLoadingStatus(true);
-                        await provider.auth.signOut();
+                       // await provider.auth.signOut();
                         context.go(
                             "${RouteConstants.loginInvitedScreen}?eid=${provider.eventId}");
                         provider.updateLoadingStatus(true);

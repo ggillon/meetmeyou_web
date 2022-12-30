@@ -102,6 +102,7 @@ abstract class MMYEngine {
 
   /// Invite contact to event
   Future<Event> inviteContactsToEvent(String eid, {required List<String> CIDs});
+
 }
 
 class MMY implements MMYEngine {

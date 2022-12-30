@@ -153,7 +153,7 @@ class ViewProfileScreen extends StatelessWidget {
                         provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
                         provider.loginInfo.setLoginState(false);
                         provider.loginInfo.setLogoutState(true);
-                        await provider.auth.signOut();
+                        //await provider.auth.signOut();
                         context.go("${RouteConstants.loginInvitedScreen}?eid=${provider.eventId}");
                         provider.updateLoadingStatus(true);
                       }

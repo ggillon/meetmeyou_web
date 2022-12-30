@@ -199,4 +199,30 @@ Future<void> login(
 
 }
 
+  /// this is used when user sign up with apple login
+  bool checkAppleLoginFilledProfile = false;
+
+  bool checkFilled = true;
+
+  updateCheckFilled(bool val){
+    checkFilled = val;
+    notifyListeners();
+  }
+
+  Future checkFilledProfile(BuildContext context) async{
+    updateCheckFilled(true);
+    mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
+
+    var value = await mmyEngine!.filledProfile().catchError((e){
+      updateCheckFilled(false);
+      DialogHelper.showMessage(context, "error_message".tr());
+    });
+
+    if(value != null){
+      checkAppleLoginFilledProfile = value;
+      SharedPreference.prefs!.setBool(SharedPreference.checkAppleLoginFilledProfile, value);
+      updateCheckFilled(false);
+    }
+  }
+
 }

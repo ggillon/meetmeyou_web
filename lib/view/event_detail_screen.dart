@@ -301,7 +301,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         provider.loginInfo.setLogoutState(true);
                         provider.updateLoadingStatus(true);
                         // await FirebaseFirestore.instance.clearPersistence();
-                         await provider.auth.signOut();
+                        // await provider.auth.signOut();
                         context.go("${RouteConstants.loginInvitedScreen}?eid=${provider.eventId}");
                         provider.updateLoadingStatus(true);
                       }

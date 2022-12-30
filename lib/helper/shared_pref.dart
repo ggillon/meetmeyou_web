@@ -22,5 +22,8 @@ class SharedPreference{
   static const String nonAttendingProfileKeys = "nonAttendingProfileKeys";
   static const String invitedProfileKeys = "invitedProfileKeys";
 
+  static const String isAppleUser = "isAppleUser";
+  static const String checkAppleLoginFilledProfile = "checkAppleLoginFilledProfile";
+
   static SharedPreferences? prefs;
 }
