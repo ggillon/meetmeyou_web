@@ -40,6 +40,11 @@ class EditProfileScreen extends StatelessWidget {
       body: BaseView<EditProfileProvider>(
         onModelReady: (provider) async {
           this.provider = provider;
+
+          if(SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == true){
+            await provider.getUserProfile(context);
+          }
+
           firstNameController.text =
               SharedPreference.prefs!.getString(SharedPreference.firstName) ??
                   "";

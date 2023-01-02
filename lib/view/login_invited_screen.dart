@@ -262,7 +262,9 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
-                : provider.signInWithApple(context);
+                : provider.signInWithApple(context).then((value) async {
+                  await provider.checkFilledProfile(context);
+            });
           }) : Container()
         ],
       ),

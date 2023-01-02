@@ -52,6 +52,36 @@ class EditProfileProvider extends BaseProvider{
   //     return false;
   //   }
   // }
+  Future<void> getUserProfile(BuildContext context) async {
+    setState(ViewState.Busy);
+
+    mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
+    var profileResponse = await mmyEngine!.getUserProfile().catchError((e) {
+      setState(ViewState.Idle);
+      // DialogHelper.showMessage(context, e.message);
+      context.go("${RouteConstants.loginInvitedScreen}?eid=${eventId}");
+    });
+
+    if(profileResponse != null){
+      SharedPreference.prefs!.setString(SharedPreference.firstName, profileResponse.firstName.toString());
+      SharedPreference.prefs!.setString(SharedPreference.lastName, profileResponse.lastName.toString());
+      SharedPreference.prefs!.setString(SharedPreference.displayName, profileResponse.displayName.toString());
+      SharedPreference.prefs!.setString(SharedPreference.email, profileResponse.email.toString());
+      SharedPreference.prefs!.setString(SharedPreference.phone, profileResponse.phoneNumber.toString());
+      SharedPreference.prefs!.setString(SharedPreference.countryCode, profileResponse.countryCode.toString());
+      SharedPreference.prefs!.setString(SharedPreference.address, profileResponse.addresses['Home'] ?? "");
+      SharedPreference.prefs!.setString(SharedPreference.profileUrl, profileResponse.photoURL.toString());
+      userDetail.firstName = profileResponse.firstName;
+      userDetail.lastName = profileResponse.lastName;
+      userDetail.displayName = profileResponse.displayName;
+      userDetail.email = profileResponse.email;
+      userDetail.phone = profileResponse.phoneNumber;
+      userDetail.countryCode = profileResponse.countryCode;
+      userDetail.address = profileResponse.addresses['Home'] ?? "";
+      userDetail.profileUrl = profileResponse.photoURL;
+    }
+    setState(ViewState.Idle);
+  }
 
   Future<void> updateProfile(BuildContext context, String firstName, String lastName, String countryCode, String phoneNo, String email, String address) async {
     setState(ViewState.Busy);
@@ -72,6 +102,11 @@ class EditProfileProvider extends BaseProvider{
       userDetail.countryCode = userProfile.countryCode;
       userDetail.address = userProfile.addresses['Home'];
       userDetail.profileUrl = userProfile.photoURL;
+
+      if(SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == true){
+        loginInfo.setLoginState(true);
+        loginInfo.setLogoutState(false);
+      }
     }
     setState(ViewState.Idle);
   }

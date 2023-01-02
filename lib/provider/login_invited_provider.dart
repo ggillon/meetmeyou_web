@@ -169,7 +169,7 @@ Future<void> signInWithApple(BuildContext context) async {
     var value = await mmyEngine!.isNew();
     if (value) {
       var userProfile = await mmyEngine!.createUserProfile();
-     // await mmyEngine!.appleFirstSignIn();
+      await mmyEngine!.appleFirstSignIn();
       print(userProfile);
       updateData(false);
       SharedPreference.prefs!.setString(SharedPreference.userId, userProfile.uid.toString());
@@ -210,19 +210,20 @@ Future<void> login(
   }
 
   Future checkFilledProfile(BuildContext context) async{
-    updateCheckFilled(true);
+    updateData(true);
     mmyEngine = locator<MMYEngine>(param1: auth.currentUser);
 
     var value = await mmyEngine!.filledProfile().catchError((e){
-      updateCheckFilled(false);
+      updateData(false);
       DialogHelper.showMessage(context, "error_message".tr());
     });
 
     if(value != null){
       checkAppleLoginFilledProfile = value;
       SharedPreference.prefs!.setBool(SharedPreference.checkAppleLoginFilledProfile, value);
-      updateCheckFilled(false);
+      updateData(false);
     }
+    updateData(false);
   }
 
 }
