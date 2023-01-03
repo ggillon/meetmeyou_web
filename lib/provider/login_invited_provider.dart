@@ -170,18 +170,20 @@ Future<void> signInWithApple(BuildContext context) async {
     if (value) {
       var userProfile = await mmyEngine!.createUserProfile();
       await mmyEngine!.appleFirstSignIn();
+      await checkFilledProfile(context);
       print(userProfile);
-      updateData(false);
       SharedPreference.prefs!.setString(SharedPreference.userId, userProfile.uid.toString());
-      loginInfo = Provider.of<LoginInfo>(context, listen: false);
-      loginInfo.setLoginState(true);
-      loginInfo.setLogoutState(false);
-    } else {
       updateData(false);
+      loginInfo = Provider.of<LoginInfo>(context, listen: false);
+      loginInfo.setLoginState(false);
+      loginInfo.setLogoutState(true);
+    } else {
+      await checkFilledProfile(context);
       SharedPreference.prefs!.setString(SharedPreference.userId, user.uid.toString());
       loginInfo = Provider.of<LoginInfo>(context, listen: false);
       loginInfo.setLoginState(true);
       loginInfo.setLogoutState(false);
+      updateData(false);
     }
   }
 }
@@ -222,6 +224,8 @@ Future<void> login(
       checkAppleLoginFilledProfile = value;
       SharedPreference.prefs!.setBool(SharedPreference.checkAppleLoginFilledProfile, value);
       updateData(false);
+    } else{
+      SharedPreference.prefs!.setBool(SharedPreference.checkAppleLoginFilledProfile, false);
     }
     updateData(false);
   }

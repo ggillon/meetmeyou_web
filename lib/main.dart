@@ -208,8 +208,8 @@ class MyApp extends StatelessWidget {
          if(isLoggedOut) {
          //  _loginInfo.setLoginState(false);
          //  return (isOnEventDetail || isOnViewProfile || isOnEditProfile || isOnGalleryPage || isOnGalleryView || isOnCheckResponses) ?
-           return isGoingToLogin ? null :
-           (SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == true) ? RouteConstants.editProfileScreen :
+           return isGoingToLogin ? ((SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == false) ? RouteConstants.editProfileScreen : null) :
+           (SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == false) ? RouteConstants.editProfileScreen :
            "${RouteConstants.loginInvitedScreen}?eid=${loc.length == 2 ? loc[1] : (SharedPreference.prefs?.getString(SharedPreference.eventId) ?? "null")}";
          }
 

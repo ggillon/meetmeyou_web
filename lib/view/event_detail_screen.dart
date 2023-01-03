@@ -99,7 +99,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           await provider.inviteUrl(context, provider.eventId.toString()));
         }
 
-        SharedPreference.prefs!.setBool(SharedPreference.checkAppleLoginFilledProfile, false);
+        SharedPreference.prefs!.setBool(SharedPreference.checkAppleLoginFilledProfile, true);
       },
       builder: (context, provider, _) {
         return provider.state == ViewState.Busy
