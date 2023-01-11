@@ -143,7 +143,8 @@ class CommonWidgets{
    );
  }
 
- static Widget titleDateLocationCard(BuildContext context, String eventTitle, DateTime startDate, DateTime endDate, String location, String organiserName) {
+ static Widget titleDateLocationCard(BuildContext context, String eventTitle, DateTime startDate, DateTime endDate, String location, String organiserName,
+     String description) {
    return Container(
      // width: DimensionConstants.d200.w,
      padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d5.w),
@@ -195,7 +196,7 @@ class CommonWidgets{
                                  DateTimeHelper.dateConversion(endDate) +
                                  " ( ${DateTimeHelper.convertEventDateToTimeFormat(endDate)})")
                              .regularText(ColorConstants.colorGray, DimensionConstants.d12.sp, TextAlign.left, maxLines: 1, overflow: TextOverflow.ellipsis),
-                       )
+                       ),
                      ],
                    ),
                    SizedBox(height: DimensionConstants.d6.h),
@@ -225,9 +226,11 @@ class CommonWidgets{
                              maxLines: 1, overflow: TextOverflow.ellipsis),
                        ),
                      ],
-                   )
+                   ),
                  ],
                ),
+               SizedBox(width: DimensionConstants.d5.w),
+               addToCalendarCard(eventTitle, startDate, endDate, location, description),
              ],
            ),
          )),
@@ -254,6 +257,46 @@ class CommonWidgets{
                .boldText(ColorConstants.primaryColor, DimensionConstants.d14.sp,
                TextAlign.center)
          ],
+       ),
+     ),
+   );
+ }
+
+ static Widget addToCalendarCard(String title, DateTime startDate, DateTime endDate, String location, String description) {
+   return GestureDetector(
+     onTap: (){
+       /// google calendar url
+
+       String eventTitle = Uri.encodeComponent(title ?? "");
+       String eventLocation = Uri.encodeComponent(location ?? "");
+       String eventDetail = Uri.encodeComponent(description ?? "");
+       String eventStartDate = "${startDate.toString().replaceAll("-", "").replaceAll(":", "").replaceAll(" ", "T").substring(0, 15)}Z";
+       String eventEndDate = "${endDate.toString().replaceAll("-", "").replaceAll(":", "").replaceAll(" ", "T").substring(0, 15)}Z";
+
+       html.window.open('https://www.google.com/calendar/render?action=TEMPLATE&'
+           'sf=true&output=xml&text=$eventTitle&location=$eventLocation'
+           '&details=$eventDetail&dates=$eventStartDate/$eventEndDate', 'new tab');
+     },
+     child: Card(
+       shape: RoundedRectangleBorder(
+           borderRadius: BorderRadius.circular(DimensionConstants.d12.r)),
+       child: Container(
+         decoration: BoxDecoration(
+             color: ColorConstants.primaryColor,
+             borderRadius:BorderRadius.circular(DimensionConstants.d12.r) // use instead of BorderRadius.all(Radius.circular(20))
+         ),
+         padding: EdgeInsets.symmetric(horizontal: DimensionConstants.d7.w, vertical: DimensionConstants.d10.h),
+         child:Column(
+           mainAxisAlignment: MainAxisAlignment.center,
+           children: [
+             Text("add_to".tr())
+                 .regularText(ColorConstants.colorWhite,
+                 DimensionConstants.d15.sp, TextAlign.center),
+             Text("calendar".tr())
+                 .regularText(ColorConstants.colorWhite, DimensionConstants.d14.sp,
+                 TextAlign.center)
+           ],
+         ),
        ),
      ),
    );

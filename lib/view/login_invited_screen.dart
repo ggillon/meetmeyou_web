@@ -161,7 +161,8 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
                                           provider.eventResponse!.end,
                                           provider.eventResponse?.location ?? "",
                                           provider.eventResponse?.organiserName ??
-                                              ""),
+                                              "", provider.eventResponse?.description ??
+                                          ""),
                                     )
                                   ],
                                 ),

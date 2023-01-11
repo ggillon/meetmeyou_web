@@ -152,12 +152,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   bottom: -DimensionConstants.d75,
                                   child: CommonWidgets.titleDateLocationCard(context, provider.event?.title ?? "",  provider.event!.start
                                       , provider.event!.end, provider.event?.location ?? "",
-                                      provider.event?.organiserName ?? ""),
+                                      provider.event?.organiserName ?? "", provider.event?.description ?? ""),
                                 )
                               ],
                             ),
                             SizedBox(height: DimensionConstants.d85.h),
-                           provider.multipleDates ? multiAttendDateUi(context, provider)
+                           provider.multipleDates ? (provider.respondBtnStatus == "edit" ? CommonWidgets.respondBtn(
+                               context,
+                               "organiser".tr(),
+                               ColorConstants.colorNewGray,
+                               ColorConstants.colorGray, onTapFun: () {},
+                               width: MediaQuery.of(context).size.width/1.2) : multiAttendDateUi(context, provider))
                                : provider.respondBtnStatus == "" ? Container() : (Align(
                               alignment: Alignment.center,
                               child: (provider.respondBtnStatus == "edit") ?  CommonWidgets.respondBtn(
