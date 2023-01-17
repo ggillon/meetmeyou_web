@@ -80,5 +80,8 @@
   "loading_contacts": "Loading Contacts....",
   "sorry_no_contacts_found": "Sorry no contacts found",
   "add_to" : "Add to",
-  "calendar" : "Calendar"
+  "calendar" : "Calendar",
+  "google" : "Google",
+  "apple" : "Apple",
+  "outlook" : "Outlook"
 }

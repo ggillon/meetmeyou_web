@@ -310,6 +310,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         // await FirebaseFirestore.instance.clearPersistence();
                         // await provider.auth.signOut();
                         context.go("${RouteConstants.loginInvitedScreen}?eid=${provider.eventId}");
+                        SharedPreference.prefs!.clear();
                         provider.updateLoadingStatus(true);
                       }
                     },

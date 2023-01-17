@@ -40,6 +40,9 @@ class EditProfileScreen extends StatelessWidget {
       body: BaseView<EditProfileProvider>(
         onModelReady: (provider) async {
           this.provider = provider;
+          provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+
+          SharedPreference.prefs!.setBool(SharedPreference.checkAppleLoginFilledProfile, true);
 
           if(SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == true){
             await provider.getUserProfile(context);
@@ -60,7 +63,7 @@ class EditProfileScreen extends StatelessWidget {
               SharedPreference.prefs!.getString(SharedPreference.email) ?? "";
           addressController.text =
               SharedPreference.prefs!.getString(SharedPreference.address) ?? "";
-          provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+
         },
         builder: (context, provider, _) {
           return Form(
@@ -87,7 +90,7 @@ class EditProfileScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        (SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == true) ? Container()
+                        (SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == false) ? Container()
                             :   GestureDetector(
                           onTap: () {
                             provider.loginInfo =
@@ -205,7 +208,7 @@ class EditProfileScreen extends StatelessWidget {
                                 DimensionConstants.d16.sp, TextAlign.left),
                   ),
                 ),
-                (SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == true) ? Container()
+                (SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == false) ? Container()
                  : Container(
                   width: DimensionConstants.d80.w,
                   alignment: Alignment.centerRight,
@@ -252,6 +255,7 @@ class EditProfileScreen extends StatelessWidget {
                        // await provider.auth.signOut();
                         context.go(
                             "${RouteConstants.loginInvitedScreen}?eid=${provider.eventId}");
+                        SharedPreference.prefs!.clear();
                         provider.updateLoadingStatus(true);
                       }
                     },

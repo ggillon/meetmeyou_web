@@ -1,3 +1,4 @@
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -18,8 +19,6 @@ import 'dart:html' as html;
 import 'package:url_launcher/url_launcher.dart';
 
 class CommonWidgets{
-
-
 
  static Widget commonAppBar(BuildContext context, bool navigate, {String? routeName, String? userName, Function? onTapLogout}){
     return Card(
@@ -230,7 +229,7 @@ class CommonWidgets{
                  ],
                ),
                SizedBox(width: DimensionConstants.d5.w),
-               addToCalendarCard(eventTitle, startDate, endDate, location, description),
+               addToCalendarCard(context, eventTitle, startDate, endDate, location, description),
              ],
            ),
          )),
@@ -262,20 +261,55 @@ class CommonWidgets{
    );
  }
 
- static Widget addToCalendarCard(String title, DateTime startDate, DateTime endDate, String location, String description) {
-   return GestureDetector(
-     onTap: (){
-       /// google calendar url
+ static Widget addToCalendarCard(BuildContext context, String title, DateTime startDate, DateTime endDate, String location, String description) {
+   String eventTitle = Uri.encodeComponent(title ?? "");
+   String eventLocation = Uri.encodeComponent(location ?? "");
+   String eventDetail = Uri.encodeComponent(description ?? "");
+   String eventStartDate = "${startDate.toString().replaceAll("-", "").replaceAll(":", "").replaceAll(" ", "T").substring(0, 15)}Z";
+   String eventEndDate = "${endDate.toString().replaceAll("-", "").replaceAll(":", "").replaceAll(" ", "T").substring(0, 15)}Z";
+   return PopupMenuButton<int>(
+     // constraints: BoxConstraints(
+     //   maxWidth: 175
+     // ),
+     itemBuilder: (context) => [
+       // popupmenu item 1
+       PopupMenuItem(
+         value: 1,
+         child: calendarInviteRow("google".tr(), ImageConstants.ic_google),
+       ),
+       // popupmenu item 2
+       PopupMenuItem(
+         value: 2,
+         child: calendarInviteRow("apple".tr(), ImageConstants.ic_apple),
+       ),
+       PopupMenuItem(
+         value: 2,
+         child: calendarInviteRow("outlook".tr(), ImageConstants.ic_outlook),
+       ),
+     ],
+     offset: const Offset(0, 0),
+     color: ColorConstants.colorWhite,
+     elevation: 2.5,
+     tooltip: "",
+     onSelected: (value) {
+       if (value == 1) {
+         /// google calendar url
 
-       String eventTitle = Uri.encodeComponent(title ?? "");
-       String eventLocation = Uri.encodeComponent(location ?? "");
-       String eventDetail = Uri.encodeComponent(description ?? "");
-       String eventStartDate = "${startDate.toString().replaceAll("-", "").replaceAll(":", "").replaceAll(" ", "T").substring(0, 15)}Z";
-       String eventEndDate = "${endDate.toString().replaceAll("-", "").replaceAll(":", "").replaceAll(" ", "T").substring(0, 15)}Z";
+         html.window.open('https://www.google.com/calendar/render?action=TEMPLATE&'
+             'sf=true&output=xml&text=$eventTitle&location=$eventLocation'
+             '&details=$eventDetail&dates=$eventStartDate/$eventEndDate', 'new tab');
 
-       html.window.open('https://www.google.com/calendar/render?action=TEMPLATE&'
-           'sf=true&output=xml&text=$eventTitle&location=$eventLocation'
-           '&details=$eventDetail&dates=$eventStartDate/$eventEndDate', 'new tab');
+       } else if (value == 2 || value == 3) {
+         /// apple and outlook ics file for calendar
+
+         final anchor = html.document.createElement('a') as html.AnchorElement
+           ..href = makeIcsFile(eventStartDate.replaceAll("Z", ""), eventEndDate.replaceAll("Z", ""), title, description, location)
+           ..style.display = 'none'
+           ..download = "$title.ics";
+         html.document.body?.children.add(anchor);
+
+         anchor.click();
+       }
      },
      child: Card(
        shape: RoundedRectangleBorder(
@@ -300,6 +334,59 @@ class CommonWidgets{
        ),
      ),
    );
+ }
+
+ static Widget calendarInviteRow(String title, String logoPath){
+   return Row(
+     mainAxisAlignment: MainAxisAlignment.start,
+     children: [
+       ImageView(path: logoPath, height: DimensionConstants.d20.h, width: 30),
+       SizedBox(width: DimensionConstants.d5.w),
+       Expanded(child: Text(title).mediumText(ColorConstants.colorBlack, DimensionConstants.d12.sp, TextAlign.left))
+     ],
+   );
+ }
+
+ static var icsFile;
+
+ static makeIcsFile(startDate, endDate, title, description, location) {
+   var test =
+       "BEGIN:VCALENDAR\n" +
+           "CALSCALE:GREGORIAN\n" +
+           "METHOD:PUBLISH\n" +
+           "PRODID:-//Test Cal//EN\n" +
+           "VERSION:2.0\n" +
+           "BEGIN:VEVENT\n" +
+           "UID:test-1\n" +
+           "DTSTART;VALUE=DATE:" +
+           startDate +
+           "\n" +
+           "DTEND;VALUE=DATE:" +
+           endDate +
+           "\n" +
+           "SUMMARY:" +
+           title +
+           "\n" +
+           "DESCRIPTION:" +
+           description +
+           "\n" +
+           "LOCATION:" +
+           location +
+           "\n" +
+           "END:VEVENT\n" +
+           "END:VCALENDAR";
+
+   var data =  html.File([test], "$title.ics");
+
+   // If we are replacing a previously generated file we need to
+   // manually revoke the object URL to avoid memory leaks.
+   if (icsFile != null) {
+     html.Url.revokeObjectUrl(icsFile);
+   }
+
+   icsFile = html.Url.createObjectUrl(data);
+
+   return icsFile;
  }
 
   static Widget appPlayStoreBtn(BuildContext context){

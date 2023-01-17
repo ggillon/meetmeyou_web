@@ -24,4 +24,5 @@ class ImageConstants {
   static const small_logo_icon = "images/ic_smallLogo.svg";
   static const small_add_icon = "images/ic_small_add.svg";
   static const invited_waiting_icon = "images/ic_moreIcon.svg";
+  static const ic_outlook = "images/outlook_logo1.png";
  }

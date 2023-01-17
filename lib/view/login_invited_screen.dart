@@ -54,6 +54,7 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
     return BaseView<LoginInvitedProvider>(
         onModelReady: (provider) async {
           this.provider = provider;
+          SharedPreference.prefs!.clear();
          // print(MediaQuery.of(context).size.width);
           bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
           bool isAndroid = Theme.of(context).platform == TargetPlatform.android;

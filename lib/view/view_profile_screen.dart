@@ -10,6 +10,7 @@ import 'package:meetmeyou_web/constants/route_constants.dart';
 import 'package:meetmeyou_web/enum/view_state.dart';
 import 'package:meetmeyou_web/extensions/all_extensions.dart';
 import 'package:meetmeyou_web/helper/common_widgets.dart';
+import 'package:meetmeyou_web/helper/shared_pref.dart';
 import 'package:meetmeyou_web/locator.dart';
 import 'package:meetmeyou_web/main.dart';
 import 'package:meetmeyou_web/provider/view_profile_provider.dart';
@@ -27,8 +28,10 @@ class ViewProfileScreen extends StatelessWidget {
       body: BaseView<ViewProfileProvider>(
         onModelReady: (provider){
           this.provider = provider;
-          provider.getUserProfile(context);
           provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
+          SharedPreference.prefs!.setBool(SharedPreference.checkAppleLoginFilledProfile, true);
+          provider.getUserProfile(context);
+         // provider.loginInfo = Provider.of<LoginInfo>(context, listen: false);
         },
         builder: (context, provider, _){
           return provider.state == ViewState.Busy ? Center(
@@ -155,6 +158,7 @@ class ViewProfileScreen extends StatelessWidget {
                         provider.loginInfo.setLogoutState(true);
                         //await provider.auth.signOut();
                         context.go("${RouteConstants.loginInvitedScreen}?eid=${provider.eventId}");
+                        SharedPreference.prefs!.clear();
                         provider.updateLoadingStatus(true);
                       }
                     },

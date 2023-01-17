@@ -46,7 +46,6 @@ Future<void> main() async {
     ),
   );
   await EasyLocalization.ensureInitialized();
-  // Disable persistence on web platforms
   await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
   SharedPreference.prefs = await SharedPreferences.getInstance();
   setupLocator();
@@ -209,7 +208,7 @@ class MyApp extends StatelessWidget {
          //  _loginInfo.setLoginState(false);
          //  return (isOnEventDetail || isOnViewProfile || isOnEditProfile || isOnGalleryPage || isOnGalleryView || isOnCheckResponses) ?
            return isGoingToLogin ? ((SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == false) ? RouteConstants.editProfileScreen : null) :
-           (SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == false) ? RouteConstants.editProfileScreen :
+         //  (SharedPreference.prefs!.getBool(SharedPreference.checkAppleLoginFilledProfile) == false) ? RouteConstants.editProfileScreen :
            "${RouteConstants.loginInvitedScreen}?eid=${loc.length == 2 ? loc[1] : (SharedPreference.prefs?.getString(SharedPreference.eventId) ?? "null")}";
          }
 
