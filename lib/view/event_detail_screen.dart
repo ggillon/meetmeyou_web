@@ -21,6 +21,7 @@ import 'package:meetmeyou_web/models/event.dart';
 import 'package:meetmeyou_web/provider/event_detail_provider.dart';
 import 'package:meetmeyou_web/view/base_view.dart';
 import 'package:meetmeyou_web/widgets/custom_dialog.dart';
+import 'package:meetmeyou_web/widgets/custom_stack.dart';
 import 'package:meetmeyou_web/widgets/image_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -143,7 +144,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Stack(
+                            Stack2(
                               clipBehavior: Clip.none,
                               alignment: Alignment.bottomCenter,
                               children: [

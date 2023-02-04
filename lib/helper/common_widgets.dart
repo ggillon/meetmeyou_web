@@ -1,8 +1,11 @@
 
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ical/serializer.dart';
 import 'package:meetmeyou_web/constants/color_constants.dart';
 import 'package:meetmeyou_web/constants/dimension_constants.dart';
 import 'package:meetmeyou_web/constants/image_constants.dart';
@@ -15,6 +18,7 @@ import 'package:meetmeyou_web/main.dart';
 import 'package:meetmeyou_web/models/event.dart';
 import 'package:meetmeyou_web/widgets/image_view.dart';
 import 'dart:html' as html;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:url_launcher/url_launcher.dart';
 
@@ -157,7 +161,12 @@ class CommonWidgets{
            child: Row(
              //  mainAxisSize: MainAxisSize.min,
              children: [
-               dateCard(startDate),
+               Column(
+                 children: [
+                   dateCard(startDate),
+                   MediaQuery.of(context).size.width < 600 ? addToCalendarCard(context, eventTitle, startDate, endDate, location, description) : Container()
+                 ],
+               ),
                SizedBox(width: DimensionConstants.d5.w),
                Column(
                  crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,8 +237,8 @@ class CommonWidgets{
                    ),
                  ],
                ),
-               SizedBox(width: DimensionConstants.d5.w),
-               addToCalendarCard(context, eventTitle, startDate, endDate, location, description),
+               MediaQuery.of(context).size.width < 600 ? Container() :   SizedBox(width: DimensionConstants.d5.w),
+             MediaQuery.of(context).size.width < 600 ? Container() : addToCalendarCard(context, eventTitle, startDate, endDate, location, description),
              ],
            ),
          )),
@@ -268,9 +277,6 @@ class CommonWidgets{
    String eventStartDate = "${startDate.toString().replaceAll("-", "").replaceAll(":", "").replaceAll(" ", "T").substring(0, 15)}Z";
    String eventEndDate = "${endDate.toString().replaceAll("-", "").replaceAll(":", "").replaceAll(" ", "T").substring(0, 15)}Z";
    return PopupMenuButton<int>(
-     // constraints: BoxConstraints(
-     //   maxWidth: 175
-     // ),
      itemBuilder: (context) => [
        // popupmenu item 1
        PopupMenuItem(
@@ -292,6 +298,9 @@ class CommonWidgets{
      elevation: 2.5,
      tooltip: "",
      onSelected: (value) {
+       bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+       bool isAndroid = Theme.of(context).platform == TargetPlatform.android;
+       bool isMac = Theme.of(context).platform == TargetPlatform.macOS;
        if (value == 1) {
          /// google calendar url
 
@@ -302,13 +311,84 @@ class CommonWidgets{
        } else if (value == 2 || value == 3) {
          /// apple and outlook ics file for calendar
 
-         final anchor = html.document.createElement('a') as html.AnchorElement
-           ..href = makeIcsFile(eventStartDate.replaceAll("Z", ""), eventEndDate.replaceAll("Z", ""), title, description, location)
-           ..style.display = 'none'
-           ..download = "$title.ics";
-         html.document.body?.children.add(anchor);
+         ICalendar cal = ICalendar();
+         cal.addElement(
+           IEvent(
+             summary: title,
+             start: startDate,
+             end: endDate,
+             location: location,
+             description: description,
+           ),
+         );
 
-         anchor.click();
+         html.AnchorElement(
+             href: "data:text/calendar;charset=utf8,${Uri.encodeComponent(cal.serialize())}")
+           ..setAttribute("download", "$title.ics")
+           ..click();
+
+
+         // if(isMac){
+         //
+         //   final anchor = html.document.createElement('a') as html.AnchorElement
+         //     ..href = makeIcsFile(eventStartDate.replaceAll("Z", ""), eventEndDate.replaceAll("Z", ""), title, description, location)
+         //     ..style.display = 'none'
+         //     ..download = "$title.ics";
+         //   html.document.body?.children.add(anchor);
+         //
+         //   anchor.click();
+         // }
+         // else if(isIOS || isAndroid) {
+         //  //  makeIcsFile(eventStartDate.replaceAll("Z", ""), eventEndDate.replaceAll("Z", ""), title, description, location);
+         //   // icsFile.replace("https://","calshow://");
+         //   // html.window.open("webcal://meetmeyou.com/events/$icsFile"
+         //   // , 'new tab');
+         //
+         //   // html.window.open('data:text/calendar,' + Uri.encodeComponent(icsFile), 'tab');
+         //
+         //    // html.window.open("https://calndr.link/e/fr43KEWMHo?s=apple"
+         //    //     , 'tab');
+         //   // var ical =
+         //   //     "BEGIN:VCALENDAR\n" +
+         //   //         "CALSCALE:GREGORIAN\n" +
+         //   //         "METHOD:PUBLISH\n" +
+         //   //         "PRODID:-//Test Cal//EN\n" +
+         //   //         "VERSION:2.0\n" +
+         //   //         "BEGIN:VEVENT\n" +
+         //   //         "UID:test-1\n" +
+         //   //         "DTSTART;VALUE=DATE:" +
+         //   //         eventStartDate.replaceAll("Z", "") +
+         //   //         "\n" +
+         //   //         "DTEND;VALUE=DATE:" +
+         //   //         eventEndDate.replaceAll("Z", "") +
+         //   //         "\n" +
+         //   //         "SUMMARY:" +
+         //   //         title +
+         //   //         "\n" +
+         //   //         "DESCRIPTION:" +
+         //   //         description +
+         //   //         "\n" +
+         //   //         "LOCATION:" +
+         //   //         location +
+         //   //         "\n" +
+         //   //         "END:VEVENT\n" +
+         //   //         "END:VCALENDAR";
+         //   //
+         //   // html.window.open('data:text/calendar;charset=utf8,' + Uri.encodeComponent(ical), '_self');
+         //
+         //   ICalendar cal = ICalendar();
+         //   cal.addElement(
+         //     IEvent(
+         //       summary: title,
+         //       start: startDate,
+         //       end: endDate,
+         //       location: location,
+         //       description: description,
+         //     ),
+         //   );
+         //   html.window.open('data:text/calendar;charset=utf8,' + Uri.encodeComponent(cal.serialize()), '_self');
+         // }
+
        }
      },
      child: Card(
@@ -325,9 +405,9 @@ class CommonWidgets{
            children: [
              Text("add_to".tr())
                  .regularText(ColorConstants.colorWhite,
-                 DimensionConstants.d15.sp, TextAlign.center),
+                 MediaQuery.of(context).size.width < 600 ? DimensionConstants.d12.sp : DimensionConstants.d15.sp, TextAlign.center),
              Text("calendar".tr())
-                 .regularText(ColorConstants.colorWhite, DimensionConstants.d14.sp,
+                 .regularText(ColorConstants.colorWhite, MediaQuery.of(context).size.width < 600 ? DimensionConstants.d12.sp : DimensionConstants.d14.sp,
                  TextAlign.center)
            ],
          ),

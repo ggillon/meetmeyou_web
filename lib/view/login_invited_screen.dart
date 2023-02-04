@@ -18,6 +18,7 @@ import 'package:meetmeyou_web/main.dart';
 import 'package:meetmeyou_web/models/event.dart';
 import 'package:meetmeyou_web/provider/login_invited_provider.dart';
 import 'package:meetmeyou_web/view/base_view.dart';
+import 'package:meetmeyou_web/widgets/custom_stack.dart';
 import 'package:meetmeyou_web/widgets/image_view.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -147,7 +148,7 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Stack(
+                                Stack2(
                                   clipBehavior: Clip.none,
                                   alignment: Alignment.bottomCenter,
                                   children: [
@@ -196,6 +197,7 @@ class _LoginInvitedScreenState extends State<LoginInvitedScreen> {
                                 SizedBox(height: DimensionConstants.d10.h),
                                 CommonWidgets.appPlayStoreBtn(context),
                                 SizedBox(height: DimensionConstants.d10.h),
+
                               ],
                             ),
                           )
